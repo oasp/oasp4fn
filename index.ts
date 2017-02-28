@@ -1,6 +1,8 @@
 
 import db from './data-collector'
+import { loadAdapter } from './data-collector'
 
+loadAdapter('mock-adapter')
 db.table('Music')
     /*.then((res: any) => {
         return res.join()
