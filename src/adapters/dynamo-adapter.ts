@@ -30,7 +30,12 @@ export function getItems (table_name: string, ids?: Array<Object>) {
         result.push({id: id})
         return result
       }, [])
-      params.RequestItems[table_name] = {Keys: keys}
+      params.RequestItems = Object.defineProperty(params.RequestItems, table_name, {
+        enumerable: true,
+        configurable: true,
+        writable: true,
+        value: { keys: keys }
+      });
       return docClient.batchGet(params).promise()
               .then((res: any) => {
                 return res.Items

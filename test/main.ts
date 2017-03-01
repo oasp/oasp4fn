@@ -1,7 +1,7 @@
 import { error } from 'util';
 
 import { expect } from 'chai'
-import db from '../data-collector'
+import db from '../src/data-collector'
 
 describe('table', () => {
   
