@@ -38,10 +38,11 @@ export function getItems (table_name: string, ids?: Array<Object>) {
     let fn = (table: Array<Object>) => Promise.resolve(table)
     if(ids)
         fn = (table: Array<Object>) => {
-             let result = _.map(table, (o: any) => {
+             let result = _.reduceRight(table, (result: Array<Object>, o: any) => {
                  if(_.indexOf(ids, o.id) > -1)
-                     return o
-                })
+                     result.push(o)
+                 return result
+                }, [])
              if(result.length !== ids.length)
                  return Promise.reject('Error returning the items')
              return Promise.resolve(result)

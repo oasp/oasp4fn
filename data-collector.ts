@@ -22,7 +22,7 @@ export default {
                     solution.push(getItem(name, ids))
                 else
                     solution.push(getItems(name, <Array<string>>ids))
-            else
+            else 
                  solution.push(getItems(name))
                 
         return this
@@ -55,25 +55,21 @@ export default {
         return this
     },
     join: function (accessor1: string, accessor2: string) {
-        console.log('join the first 2 tables ' + promises)
-        if(_.size(promises) < 2)
-            error = 'Not enough tables'
-        else {
-            solution.unshift(Promise.all(_.pullAt(solution, [0, 1]))
-                    .then((res: Array<any>) => {
-                        return (_.reduce(res, (result: Array<Object>, value: Object) => {
-                            if(_.size(result) < 2)
-                                result.push(value)
-                            return result
-                        }, []))
-                    }, (err: Error) => {
-                        return Promise.reject(err)
-                    }))
-        }
+        console.log('join the first 2 tables ' + solution)
+        solution.unshift(Promise.all(_.pullAt(solution, [0, 1]))
+                .then((res: Array<any>) => {
+                    return (_.reduce(res, (result: Array<Object>, value: Object) => {
+                        if(_.size(result) < 2)
+                            result.push(value)
+                        return result
+                    }, []))
+                }, (err: Error) => {
+                    return Promise.reject(err)
+                }))
         return this
     },
     then: function (result: Function, reject: Function) {
-        let promise: Promise<string | Array<Object>>
+        let promise: Promise<string | Array<Object>> = solution[0]
         if(error) {
             if(reject) {
                 promise = reject(error)
@@ -83,16 +79,25 @@ export default {
             }      
         }
         else {
-            if(result) {
+            if(result && reject) {
                 promise = solution[0]
                     .then((res: any) => {
                         return result(res)
-                    }, (error: Error) => {
-                        return reject(error)
+                    }, (err: Error) => {
+                        return reject(err)
                     })
             }
-            else {
-                promise = result
+            else if (result) {
+                promise = solution[0]
+                    .then((res: any) => {
+                        return result(res)
+                    })
+            }
+            else if (reject) {
+                promise = solution[0]
+                    .catch((err: Error) => {
+                        return reject(err)
+                    })
             }
         }
         error = undefined

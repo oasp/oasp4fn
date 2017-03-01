@@ -1,9 +1,7 @@
 
 import db from './data-collector'
-import { loadAdapter } from './data-collector'
 
-loadAdapter('mock-adapter')
-db.table('Music')
+db.table('employees')
     /*.then((res: any) => {
         return res.join()
     }, (err: Error) => {
@@ -14,7 +12,7 @@ db.table('Music')
     }, (err: Error) => {
         console.log(err)
     })*/
-    .table('Configurations')
+    .table('departments')
     .join()
     .then((res: Array<Object>) => {
         console.log(res)
