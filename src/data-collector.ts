@@ -8,7 +8,7 @@ import { getItems, getItem } from './adapters/mock-adapter'
 
 let promises: any = {}
 let error: any
-let solution: Array<Promise<Object | string | number>> = []
+let solution: Array<Promise<Array<Object> | Object | string | number>> = []
 
 export default {
     // tables: {},
@@ -27,13 +27,62 @@ export default {
                 
         return this
     },
-    where: function (name: string, values?: string | number, comparator?: string) {
+    where: function (attribute: string, value?: string | number, comparator?: string) {
+        let _comparator = comparator || '='
+        
+        if(solution[0])
+            solution[0] = solution[0].then((res: Array<Object>) => {
+                if(Array.isArray(res)) { 
+                    if(value) {
+                        switch(_comparator) {
+                            case '=':
+                                return _.filter(res, [attribute, value])
+                            case '!=':
+                                return _.filter(res, (o: any) => !_.isEqual(o[attribute], value))
+                            case '<':
+                                return _.filter(res, (o: any) => o[attribute] < value)
+                            case '>':
+                                return _.filter(res, (o: any) => o[attribute] > value)
+                            case '<=':
+                                return _.filter(res, (o: any) => o[attribute] <= value)
+                            case '>=':
+                                return _.filter(res, (o: any) => o[attribute] >= value)
+                            case 'has':
+                                return _.filter(res, (o: any) => _.indexOf(o[attribute], value) > -1)
+                            default:
+                                return Promise.reject('Invalid comparator in where operation')
+                        }
+                    }
+                    else
+                        return _.filter(res, (o) => _.has(o, attribute))
+                }
+                return Promise.reject('Invalid use of where operation')
+            })
+           
         return this
     },
     orderBy: function (attribute: string, order?: string) {
+        let _order = (order === 'asc' || order === 'desc') ? order : 'asc'
+
+        if(solution[0])
+            solution[0] = solution[0].then((res: Array<Object>) => {
+                if(Array.isArray(res)) 
+                   return _.orderBy(res, attribute, _order)
+                return Promise.reject('Invalid use of orderBy operation')
+            })
+
         return this
     },
     first: function(quantity?: number) {
+        let _quantity = (quantity && quantity > 1) ? quantity : 1
+
+        if(solution[0])
+            solution[0] = solution[0].then((res: Array<Object>) => {
+                if(Array.isArray(res)) 
+                   return _.slice(res, 0, _quantity)
+                return Promise.reject('Invalid use of first operation')
+            })
+
         return this
     },
     count: function () {

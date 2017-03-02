@@ -2,6 +2,7 @@
 import db from './data-collector'
 
 db.table('employees')
+    .orderBy('error', 'desc')
     /*.then((res: any) => {
         return res.join()
     }, (err: Error) => {
@@ -19,6 +20,8 @@ db.table('employees')
     }, (err: Error) => {
         console.log(err)
     })
+
+
 
 
     

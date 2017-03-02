@@ -125,12 +125,186 @@ describe('table', () => {
 
 
 describe('where', () => {
-
      it('The function should return a reference to the self object', () => {
+         expect(db.where('id')).to.be.an('object')
+         expect(db.where('id')).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'each', 'reduce', 'insert', 'delete', 'join', 'then'])
      })
-     it('If the operation is succesful, the resolution should be an array ', () => {
+     it('If the operation is succesful, the resolution should be an Array<Object>', (done: Function) => {
+         db.table('employees')
+             .where('id', '1')
+             .then((res: Array<Object>) => {
+                    try {
+                        expect(res).to.be.an('array')
+                        expect(res).to.have.lengthOf(1)
+                    }
+                    catch (err){
+                        done(err)
+                    }
+                }, (err: Error) => {
+                    try{
+                        expect(err).to.be.undefined 
+                    }
+                    catch (err) {
+                        done(err)
+                    }
+             })
+         done()
      })
-     it('If the operation fail, the resolution should be an error', () => {
+     it('If the operation fail, the resolution should be an error', (done: Function) => {
+         db.table('employess')
+             .where('id', '1', 23)
+             .then((res: Array<Object>) => {
+                    try {
+                       expect(res).to.be.undefined
+                    }
+                    catch (err) {
+                        done(err)
+                    }
+                }, (err: Error) => {
+                    try{
+                        expect(err).to.be.a('string')
+                    }
+                    catch (err) {
+                        done(err)
+                    }
+             })
+         done()
      })
-     
+})
+
+describe('orderBy', () => {
+     it('The function should return a reference to the self object', () => {
+         expect(db.orderBy('id')).to.be.an('object')
+         expect(db.orderBy('id')).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'each', 'reduce', 'insert', 'delete', 'join', 'then'])
+     })
+     it("If you don't specify an order, the result array is sorted ascendingly", (done: Function) => {
+         db.table('employees')
+             .orderBy('id')
+             .then((res: any) => {
+                    try {
+                        expect(res).to.be.an('array')
+                        expect(res).to.have.lengthOf(4)
+                        let i = res.length
+                        while(--i) {
+                            expect(res[i].id >= res[i - 1].id).to.be.true
+                        }
+                            
+                    }
+                    catch (err){
+                        done(err)
+                    }
+                }, (err: Error) => {
+                    try{
+                        expect(err).to.be.undefined 
+                    }
+                    catch (err) {
+                        done(err)
+                    }
+             })
+         done()
+     })
+     it("If you specify 'desc' as the order, the result array is sorted descendingly", (done: Function) => {
+         db.table('employees')
+             .orderBy('id', 'desc')
+             .then((res: any) => {
+                    try {
+                        expect(res).to.be.an('array')
+                        expect(res).to.have.lengthOf(4)
+                        let i = res.length
+                        while(--i) {
+                            expect(res[i].id <= res[i - 1].id).to.be.true
+                        }
+                            
+                    }
+                    catch (err){
+                        done(err)
+                    }
+                }, (err: Error) => {
+                    try{
+                        expect(err).to.be.undefined 
+                    }
+                    catch (err) {
+                        done(err)
+                    }
+             })
+         done()
+     })
+     it("If the especified attribute doesn't exist, the function return the same array", (done: Function) => {
+         db.table('employees')
+             .orderBy('error')
+             .then((res: Array<Object>) => {
+                    try {
+                       expect(res).to.be.an('array')
+                       expect(res).to.have.lengthOf(4)
+                    }
+                    catch (err) {
+                        done(err)
+                    }
+                }, (err: Error) => {
+                    try{
+                        expect(err).to.be.undefined
+                    }
+                    catch (err) {
+                        done(err)
+                    }
+             })
+         done()
+     })
+})
+
+describe('first', () => {
+    let first_object: Object
+     before(() => {
+         db.table('employees')
+             .then((res: Array<Object>) => {
+                 first_object = res[0]
+             })
+     })
+     it('The function should return a reference to the self object', () => {
+         expect(db.first()).to.be.an('object')
+         expect(db.first()).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'each', 'reduce', 'insert', 'delete', 'join', 'then'])
+     })
+     it("If the operation is succesful, the result is the first object of the table", (done: Function) => {
+         db.table('employees')
+             .first()
+             .then((res: any) => {
+                    try {
+                        expect(res).to.be.an('array')
+                        expect(res).to.have.lengthOf(1)
+                        expect(res[0]).to.be.equal(first_object)    
+                    }
+                    catch (err){
+                        done(err)
+                    }
+                }, (err: Error) => {
+                    try{
+                        expect(err).to.be.undefined 
+                    }
+                    catch (err) {
+                        done(err)
+                    }
+             })
+         done()
+     })
+     it("If the especified attribute doesn't exist, the function return the same array", (done: Function) => {
+         db.table('employees', '1')
+             .first()
+             .first()
+             .then((res: Array<Object>) => {
+                    try {
+                       expect(res).to.be.undefined
+                    }
+                    catch (err) {
+                        done(err)
+                    }
+                }, (err: Error) => {
+                    try {
+                        expect(err).to.be.a('string')
+                    }
+                    catch (err) {
+                        done(err)
+                    }
+             })
+         done()
+     })
 })

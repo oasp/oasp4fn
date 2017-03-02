@@ -8,10 +8,10 @@ let employees = [
 ]
 
 let departments = [
-    {id: "1", name: "Logistic"},
-    {id: "2", name: "RRHH"},
-    {id: "3", name: "Architecture"},
-    {id: "4", name: "UX"}
+    {id: "1", name: "Logistic", floor: [1, 2]},
+    {id: "2", name: "RRHH", floor: [3]},
+    {id: "3", name: "Architecture", floor: [2, 3]},
+    {id: "4", name: "UX", floor: [4, 5, 6]}
 ]
 
 export function getItem (table_name: string, id: string) {
