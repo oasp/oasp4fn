@@ -7,7 +7,7 @@ describe('table', () => {
   
      it('The function should return a reference to the self object', () => {
          expect(db.table('employees')).to.be.an('object')
-         expect(db.table('employees')).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'each', 'reduce', 'insert', 'delete', 'join', 'then'])
+         expect(db.table('employees')).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then'])
      })
      it('If the table exist, the resolution promise should return an Array<Object>', (done: Function) => {
         db.table('employees').then((res: Array<Object>) => {
@@ -127,7 +127,7 @@ describe('table', () => {
 describe('where', () => {
      it('The function should return a reference to the self object', () => {
          expect(db.where('id')).to.be.an('object')
-         expect(db.where('id')).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'each', 'reduce', 'insert', 'delete', 'join', 'then'])
+         expect(db.where('id')).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then'])
      })
      it('If the operation is succesful, the resolution should be an Array<Object>', (done: Function) => {
          db.table('employees')
@@ -151,7 +151,7 @@ describe('where', () => {
          done()
      })
      it('If the operation fail, the resolution should be an error', (done: Function) => {
-         db.table('employess')
+         db.table('employees')
              .where('id', '1', 23)
              .then((res: Array<Object>) => {
                     try {
@@ -175,7 +175,7 @@ describe('where', () => {
 describe('orderBy', () => {
      it('The function should return a reference to the self object', () => {
          expect(db.orderBy('id')).to.be.an('object')
-         expect(db.orderBy('id')).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'each', 'reduce', 'insert', 'delete', 'join', 'then'])
+         expect(db.orderBy('id')).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then'])
      })
      it("If you don't specify an order, the result array is sorted ascendingly", (done: Function) => {
          db.table('employees')
@@ -262,12 +262,12 @@ describe('first', () => {
      })
      it('The function should return a reference to the self object', () => {
          expect(db.first()).to.be.an('object')
-         expect(db.first()).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'each', 'reduce', 'insert', 'delete', 'join', 'then'])
+         expect(db.first()).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then'])
      })
      it("If the operation is succesful, the result is the first object of the table", (done: Function) => {
          db.table('employees')
              .first()
-             .then((res: any) => {
+             .then((res: Array<Object>) => {
                     try {
                         expect(res).to.be.an('array')
                         expect(res).to.have.lengthOf(1)
@@ -286,9 +286,9 @@ describe('first', () => {
              })
          done()
      })
-     it("If the especified attribute doesn't exist, the function return the same array", (done: Function) => {
-         db.table('employees', '1')
-             .first()
+     it("If the operation isn't done over an array, the operation should return an error", (done: Function) => {
+         db.table('employees')
+             .count()
              .first()
              .then((res: Array<Object>) => {
                     try {
@@ -298,7 +298,340 @@ describe('first', () => {
                         done(err)
                     }
                 }, (err: Error) => {
+                    try{
+                        expect(err).to.be.a('string')
+                    }
+                    catch (err) {
+                        done(err)
+                    }
+             })
+         done()
+     })
+})
+
+describe('count', () => {
+     it('The function should return a reference to the self object', () => {
+         expect(db.count()).to.be.an('object')
+         expect(db.count()).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then'])
+     })
+     it("If the operation is succesful, the result is the number of items of the table", (done: Function) => {
+         db.table('employees')
+             .count()
+             .then((res: number) => {
                     try {
+                        expect(res).to.be.an('number')
+                        expect(res).to.be.equals(4)   
+                    }
+                    catch (err){
+                        done(err)
+                    }
+                }, (err: Error) => {
+                    try{
+                        expect(err).to.be.undefined 
+                    }
+                    catch (err) {
+                        done(err)
+                    }
+             })
+         done()
+     })
+     it("If the operation isn't done over an array, the operation should return an error", (done: Function) => {
+         db.table('employees')
+             .count()
+             .count()
+             .then((res: Array<Object>) => {
+                    try {
+                       expect(res).to.be.undefined
+                    }
+                    catch (err) {
+                        done(err)
+                    }
+                }, (err: Error) => {
+                    try{
+                        expect(err).to.be.a('string')
+                    }
+                    catch (err) {
+                        done(err)
+                    }
+             })
+         done()
+     })
+})
+
+describe('project', () => {
+     it('The function should return a reference to the self object', () => {
+         expect(db.project('hi', 'bye')).to.be.an('object')
+         expect(db.project(['hi', 'bye'])).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then'])
+     })
+     it("If the operation is succesful, the result is all the objects of the table but only with the specified properties", (done: Function) => {
+         db.table('employees')
+             .project('id', 'name')
+             .then((res: Array<Object>) => {
+                    try {
+                        expect(res).to.be.an('array')
+                        expect(res).to.have.lengthOf(4)
+                        let i = res.length
+                        while(i--) {
+                            expect(res[i]).to.be.an('object')
+                            expect(res[i]).to.have.all.keys(['id', 'name'])
+                            expect(res[i]).to.not.have.all.keys(['surname', 'department'])
+                        }
+                    }
+                    catch (err){
+                        done(err)
+                    }
+                }, (err: Error) => {
+                    try {
+                        expect(err).to.be.undefined 
+                    }
+                    catch (err) {
+                        done(err)
+                    }
+             })
+         done()
+     })
+     it("If the function is called with no parametters, the operation should return an error", (done: Function) => {
+         db.table('employees')
+             .project()
+             .then((res: Array<Object>) => {
+                    try {
+                       expect(res).to.be.undefined
+                    }
+                    catch (err) {
+                        done(err)
+                    }
+                }, (err: Error) => {
+                    try{
+                        expect(err).to.be.a('string')
+                    }
+                    catch (err) {
+                        done(err)
+                    }
+             })
+         done()
+     })
+     it("If the operation isn't done over an array, the operation should return an error", (done: Function) => {
+         db.table('employees')
+             .count()
+             .project('id', 'name')
+             .then((res: Array<Object>) => {
+                    try {
+                       expect(res).to.be.undefined
+                    }
+                    catch (err) {
+                        done(err)
+                    }
+                }, (err: Error) => {
+                    try{
+                        expect(err).to.be.a('string')
+                    }
+                    catch (err) {
+                        done(err)
+                    }
+             })
+         done()
+     })
+})
+
+describe('reduce', () => {
+     it('The function should return a reference to the self object', () => {
+         expect(db.reduce((result: Array<Object>, o: any) => { 
+                result.push(o)
+                return result
+            }, [])).to.be.an('object')
+         expect(db.reduce((result: Array<Object>, o: any) => { 
+                result.push(o)
+                return result
+            }, [])).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then'])
+     })
+     it("If the operation is succesful, the result is the table with the item changes specified by the passed function", (done: Function) => {
+         db.table('employees')
+             .reduce((result: Array<Object>, o: any) =>{
+                 o.department = 1
+                 result.push(o)
+                 return result
+             }, [])
+             .then((res: Array<any>) => {
+                    try {
+                        expect(res).to.be.an('array')
+                        expect(res).to.have.lengthOf(4)
+                        let i = res.length
+                        while(i--) {
+                            expect(res[i]).to.be.an('object')
+                            expect(res[i]).to.have.all.keys(['id', 'name', 'surname', 'department'])
+                            expect(res[i].department).to.be.equal(1)
+                        }
+                    }
+                    catch (err){
+                        done(err)
+                    }
+                }, (err: Error) => {
+                    try {
+                        expect(err).to.be.undefined 
+                    }
+                    catch (err) {
+                        done(err)
+                    }
+             })
+         done()
+     })
+     it("If the operation isn't done over an array, the operation should return an error", (done: Function) => {
+         db.table('employees')
+             .count()
+             .reduce((result: Array<Object>, o: any) =>{
+                 o.department = 1
+                 result.push(o)
+                 return result
+             }, [])
+             .then((res: Array<Object>) => {
+                    try {
+                       expect(res).to.be.undefined
+                    }
+                    catch (err) {
+                        done(err)
+                    }
+                }, (err: Error) => {
+                    try{
+                        expect(err).to.be.a('string')
+                    }
+                    catch (err) {
+                        done(err)
+                    }
+             })
+         done()
+     })
+})
+
+describe('insert', () => {
+     it('The function should return a reference to the self object', () => {
+         expect(db.insert('departments', [{id: '7', name: 'Sales'}, {id: '5', name: 'Comercial'}])).to.be.an('object')
+         expect(db.insert('departments', {id: '7', name: 'Sales'})).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then'])
+     })
+     it("If the operation is succesful, the result is an id or an array of ids", (done: Function) => {
+         db.insert('departments', [{id: '7', name: 'Sales'}, {id: '5', name: 'Comercial'}])
+             .then((res: Array<any>) => {
+                    try {
+                        expect(res).to.be.an('array')
+                        expect(res).to.have.lengthOf(2)
+                    }
+                    catch (err){
+                        done(err)
+                    }
+                }, (err: Error) => {
+                    try {
+                        expect(err).to.be.undefined 
+                    }
+                    catch (err) {
+                        done(err)
+                    }
+             })
+         db.insert('departments', {id: '7', name: 'Sales'})
+             .then((res: Array<any>) => {
+                    try {
+                        expect(res).to.be.a('string').equal('7')
+                    }
+                    catch (err){
+                        done(err)
+                    }
+                }, (err: Error) => {
+                    try {
+                        expect(err).to.be.undefined 
+                    }
+                    catch (err) {
+                        done(err)
+                    }
+             })
+         done()
+     })
+     it("If the operation fail, the resolution should be an error", (done: Function) => {
+         db.insert('employee', {id: '7', name: 'Sales'})
+             .then((res: Array<Object>) => {
+                    try {
+                       expect(res).to.be.undefined
+                    }
+                    catch (err) {
+                        done(err)
+                    }
+                }, (err: Error) => {
+                    try{
+                        expect(err).to.be.a('string')
+                    }
+                    catch (err) {
+                        done(err)
+                    }
+             })
+         done()
+     })
+})
+
+describe('delete', () => {
+     it('The function should return a reference to the self object', () => {
+         expect(db.delete('employees', '1')).to.be.an('object')
+         expect(db.delete('employees', '3')).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then'])
+     })
+     it("If the operation is succesful, the result is an id or an array of ids", (done: Function) => {
+         db.delete('departments', ['2', '1'])
+             .then((res: Array<any>) => {
+                    try {
+                        expect(res).to.be.an('array')
+                        expect(res).to.have.lengthOf(2)
+                    }
+                    catch (err){
+                        done(err)
+                    }
+                }, (err: Error) => {
+                    try {
+                        expect(err).to.be.undefined 
+                    }
+                    catch (err) {
+                        done(err)
+                    }
+             })
+         db.delete('departments', '4')
+             .then((res: Array<any>) => {
+                    try {
+                        expect(res).to.be.a('string').equals('4')
+                    }
+                    catch (err){
+                        done(err)
+                    }
+                }, (err: Error) => {
+                    try {
+                        expect(err).to.be.undefined 
+                    }
+                    catch (err) {
+                        done(err)
+                    }
+             })
+         done()
+     })
+     it("If the operation fail, the resolution should be an error", (done: Function) => {
+         db.delete('employee', '3')
+             .then((res: Array<Object>) => {
+                    try {
+                       expect(res).to.be.undefined
+                    }
+                    catch (err) {
+                        done(err)
+                    }
+                }, (err: Error) => {
+                    try{
+                        expect(err).to.be.a('string')
+                    }
+                    catch (err) {
+                        done(err)
+                    }
+             })
+             db.delete('employees', 'hola')
+             .then((res: Array<Object>) => {
+                    try {
+                       expect(res).to.be.undefined
+                    }
+                    catch (err) {
+                        done(err)
+                    }
+                }, (err: Error) => {
+                    try{
                         expect(err).to.be.a('string')
                     }
                     catch (err) {

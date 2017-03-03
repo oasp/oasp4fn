@@ -1,5 +1,5 @@
 import * as _ from 'lodash'
-import { getItems, getItem } from './adapters/mock-adapter'
+import { getItems, getItem, putItem, putItems, deleteItem, deleteItems} from './adapters/mock-adapter'
 // let adapter= require('./adapters/dynamo-adapter')*/
 
 // export function loadAdapter(name: string) {
@@ -86,21 +86,49 @@ export default {
         return this
     },
     count: function () {
+        if(solution[0])
+            solution[0] = solution[0].then((res: Array<Object>) => {
+                if(Array.isArray(res))
+                    return res.length
+                return Promise.reject('Invalid use of count operation')
+            })
         return this
     },
-    project: function (attributtes: Array<string>) {
+    project: function (...attributes: Array<string | Array<string>>) {
+        if(solution[0])
+            solution[0] = solution[0].then((res: Array<Object>) => {
+                if(Array.isArray(res) && attributes.length > 0)
+                    return _.reduceRight(res, (result: Array<Object>, o: Object) => {
+                        result.push(_.pick(o, attributes))
+                        return result
+                    }, [])
+                return Promise.reject('Invalid use of project operation')
+            })
         return this
     },
-    each: function (iteratee: Function) {
-        return this
-    },
-    reduce: function (iteratee: Function, accumulator: Array<any> | Object | number) {
+    reduce: function (iteratee: _.ObjectIterator<Object, any>, accumulator: Array<any> | Object | number) {
+        if(solution[0])
+            solution[0] = solution[0].then((res: _.Dictionary<string>) => {
+                if(Array.isArray(res))
+                    return _.reduceRight(res, iteratee, accumulator)
+                return Promise.reject('Invalid use of each operation')
+            })
         return this
     },
     insert: function (table_name: string, items: Object | Array<Object>) {
+        if(Array.isArray(items))
+            solution[0] = putItems(table_name, items)
+        else
+            solution[0] = putItem(table_name, items)
+
         return this
     },
     delete: function (table_name: string, ids: string | Array<string>) {
+         if(Array.isArray(ids))
+            solution[0] = deleteItems(table_name, ids)
+        else
+            solution[0] = deleteItem(table_name, ids)
+
         return this
     },
     join: function (accessor1: string, accessor2: string) {

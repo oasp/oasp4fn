@@ -58,18 +58,110 @@ export function getItems (table_name: string, ids?: Array<Object>) {
     }
 }
 
-export function putItem (table_name: string, item: Object) {
-  
+export function putItem (table_name: string, item: any) {
+    let index: number
+    switch(table_name) {
+        case 'employees':
+            if(item.id){
+               index = _.findIndex(employees, ['id', item.id])
+               if(index < 0)
+                   employees.push(item)
+                else
+                    employees[index] = item 
+               return Promise.resolve(item.id)
+            }
+            else
+                return Promise.reject('Item is malformed, unable to insert the item')
+        case 'departments':
+             if(item.id){
+               index = _.findIndex(departments, ['id', item.id])
+               if(index < 0)
+                   departments.push(item)
+                else
+                    departments[index] = item
+               return Promise.resolve(item.id)
+            }
+            else
+                return Promise.reject('Item is malformed, unable to insert the item')
+        default:
+            return Promise.reject('The table ' + table_name + ' doesn\'t exist')
+    }
 }
 
-export function putItems (table_name: string, items: Array<Object>) {
-
+export function putItems (table_name: string, items: Array<any>) {
+    let result = []
+    let i = items.length
+    let index: number
+    switch(table_name) {
+        case 'employees':
+            while(i--){
+                if(!items[i].id)
+                    return Promise.reject('A item is malformed, the insert operation fail')
+               index = _.findIndex(employees, ['id', items[i].id])
+               if(index < 0)
+                   employees.push(items[i])
+                else
+                    employees[index] = items[i]
+                result.push(items[i].id)
+            }
+                return Promise.resolve(result)
+        case 'departments':
+            while(i--){
+                if(!items[i].id)
+                    return Promise.reject('A item is malformed, the insert operation fail')
+               index = _.findIndex(departments, ['id', items[i].id])
+               if(index < 0)
+                   departments.push(items[i])
+                else
+                    departments[index] = items[i]
+                result.push(items[i].id)
+            }
+                return Promise.resolve(result)
+        default:
+            return Promise.reject('The table ' + table_name + ' doesn\'t exist')
+    }
 }
 
 export function deleteItem (table_name: string, id: string) {
-
+    let removed_length: number
+    switch(table_name) {
+        case 'employees':
+            removed_length = _.remove(employees, (o: any) => o.id === id).length
+            if(removed_length === 1){
+               return Promise.resolve(id)
+            }
+            else
+                return Promise.reject('Unable to delete the item: ' + id)
+        case 'departments':
+            removed_length = _.remove(departments, (o: any) => o.id === id).length
+            if(removed_length === 1){
+               return Promise.resolve(id)
+            }
+            else
+                return Promise.reject('Unable to delete the item: ' + id)
+        default:
+            return Promise.reject('The table ' + table_name + ' doesn\'t exist')
+    }
 }
 
 export function deleteItems (table_name: string, ids: Array<string>) {
-
+    let removed_length: number
+    switch(table_name) {
+        case 'employees':
+            removed_length = _.remove(employees, (o: any) => _.indexOf(ids, o.id) > -1).length
+            if(removed_length ===  ids.length) {
+               return Promise.resolve(ids)
+            }
+            else
+                return Promise.reject('Unable to delete the items')
+        case 'departments':
+            removed_length = _.remove(departments, (o: any) => _.indexOf(ids, o.id) > -1).length
+            if(removed_length === ids.length){
+               return Promise.resolve(ids)
+            }
+            else
+                return Promise.reject('Unable to delete the items')
+        default:
+            return Promise.reject('The table ' + table_name + ' doesn\'t exist')
+    }
 }
