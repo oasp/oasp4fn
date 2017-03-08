@@ -1,10 +1,5 @@
 import * as _ from 'lodash'
 import { getItems, getItem, putItem, putItems, deleteItem, deleteItems} from './adapters/mock-adapter'
-// let adapter= require('./adapters/dynamo-adapter')*/
-
-// export function loadAdapter(name: string) {
-//     adapter = require('./adapters/' + name)
-// }
 
 let promises: any = {}
 let error: any
@@ -131,21 +126,38 @@ export default {
 
         return this
     },
-    join: function (accessor1: string, accessor2: string) {
-        console.log('join the first 2 tables ' + solution)
+    join: function (accessor0: string, accessor1: string) {
         solution.unshift(Promise.all(_.pullAt(solution, [0, 1]))
                 .then((res: Array<any>) => {
-                    return (_.reduce(res, (result: Array<Object>, value: Object) => {
-                        if(_.size(result) < 2)
-                            result.push(value)
-                        return result
-                    }, []))
-                }, (err: Error) => {
-                    return Promise.reject(err)
+                    if(Array.isArray(res[0]) && Array.isArray(res[1])) {
+                        let length0 = res[0].length
+                        let length1 = res[1].length
+                        if(length0 < 1 || length1 < 1)
+                            return []
+                        let index: any
+                        let aux
+                        if(length0 < length1) {
+                            index = _.groupBy(res[0], accessor0)
+                            return _.reduceRight(res[1], (result: Array<Object>, o1: any) => {
+                                aux = o1[accessor1]
+                                if(_.has(index, aux)) 
+                                    return _.map(index[aux], o0 => _.assign({}, o0, o1)).concat(result)
+                                return result
+                            }, [])
+                        }
+                        index = _.groupBy(res[1], accessor1)
+                        return _.reduceRight(res[0], (result: Array<Object>, o0: any) => {
+                            aux = o0[accessor0]
+                            if(_.has(index, aux)) 
+                                return _.map(index[aux], o1 => _.assign({}, o0, o1)).concat(result)
+                            return result
+                        }, [])
+                    }
+                    return Promise.reject('Invalid use of function join')
                 }))
         return this
     },
-    then: function (result: Function, reject: Function) {
+    then: function (result: Function | null, reject: Function | null) {
         let promise: Promise<string | Array<Object>> = solution[0]
         if(error) {
             if(reject) {

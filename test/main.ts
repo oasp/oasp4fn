@@ -502,6 +502,55 @@ describe('reduce', () => {
      })
 })
 
+describe('join', () => {
+     it('The function should return a reference to the self object', () => {
+         expect(db.table('employees').table('departments').join('department', 'id')).to.be.an('object')
+         expect(db.table('employees').table('departments').join('department', 'id')).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then'])
+     })
+     it("If the operation is succesful, the result is a joined table", (done: Function) => {
+         db.table('employees')
+             .table('departments')
+             .join('department', 'id')
+             .then((res: Array<any>) => {
+                    try {
+                        expect(res).to.be.an('array')
+                        expect(res).to.have.lengthOf(4)
+                    }
+                    catch (err){
+                        done(err)
+                    }
+                }, (err: Error) => {
+                    try {
+                        expect(err).to.be.undefined 
+                    }
+                    catch (err) {
+                        done(err)
+                    }
+             })
+         done()
+     })
+     it("If the operation fail, the resolution should be an error", (done: Function) => {
+         db.table('employees')
+             .join('department', 'id')
+             .then((res: Array<Object>) => {
+                    try {
+                       expect(res).to.be.undefined
+                    }
+                    catch (err) {
+                        done(err)
+                    }
+                }, (err: Error) => {
+                    try{
+                        expect(err).to.be.a('string')
+                    }
+                    catch (err) {
+                        done(err)
+                    }
+             })
+         done()
+     })
+})
+
 describe('insert', () => {
      it('The function should return a reference to the self object', () => {
          expect(db.insert('departments', [{id: '7', name: 'Sales'}, {id: '5', name: 'Comercial'}])).to.be.an('object')
@@ -641,3 +690,4 @@ describe('delete', () => {
          done()
      })
 })
+
