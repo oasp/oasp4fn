@@ -9,8 +9,3 @@ db.table('employees')
     }, (err: Error) => {
         console.log(err)
     })
-
-
-
-
-    

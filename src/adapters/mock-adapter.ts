@@ -1,17 +1,17 @@
 import * as _ from 'lodash'
 
 let employees = [
-    {id: "1", name: "Paquito", surname: "Chocolatero", department: "1"},
-    {id: "2", name: "Paquita", surname: "Chocolatera", department: "3"},
-    {id: "3", name: "Paco", surname: "Chocolatero", department: "1"},
-    {id: "4", name: "Fran", surname: "Chocolatero", department: "2"}
+    {id: "1", firstname: "Paquito", surname: "Chocolatero", department: "1"},
+    {id: "2", firstname: "Paquita", surname: "Chocolatera", department: "3"},
+    {id: "3", firstname: "Paco", surname: "Chocolatero", department: "1"},
+    {id: "4", firstname: "Fran", surname: "Chocolatero", department: "2"}
 ]
 
 let departments = [
-    {id: "1", name: "Logistic", floor: [1, 2]},
-    {id: "2", name: "RRHH", floor: [3]},
-    {id: "3", name: "Architecture", floor: [2, 3]},
-    {id: "4", name: "UX", floor: [4, 5, 6]}
+    {id: "1", dept_name: "Logistic", floor: [1, 2]},
+    {id: "2", dept_name: "RRHH", floor: [3]},
+    {id: "3", dept_name: "Architecture", floor: [2, 3]},
+    {id: "4", dept_name: "UX", floor: [4, 5, 6]}
 ]
 
 export function getItem (table_name: string, id: string) {

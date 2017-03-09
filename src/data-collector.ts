@@ -1,24 +1,23 @@
 import * as _ from 'lodash'
 import { getItems, getItem, putItem, putItems, deleteItem, deleteItems} from './adapters/mock-adapter'
+// import { getItems, getItem, putItem, putItems, deleteItem, deleteItems} from './adapters/dynamo-adapter'
 
-let promises: any = {}
-let error: any
 let solution: Array<Promise<Array<Object> | Object | string | number>> = []
 
 export default {
-    // tables: {},
-    // loadAdapter: function (name: string) {
-    //     adapter = require('./adapters/' + name)
-    // },
     table: function (name: string, ids?: string | Array<string>) {
-        if(!error)
-            if(ids)
-                if(typeof ids === 'string')
-                    solution.push(getItem(name, ids))
-                else
-                    solution.push(getItems(name, <Array<string>>ids))
-            else 
-                 solution.push(getItems(name))
+        switch(typeof ids) {
+            case "string":
+                solution.push(getItem(name, <string>ids))
+                break
+            case "object":
+                if(Array.isArray(ids)) {
+                    solution.push(getItems(name, ids))
+                    break
+                }
+            default:
+                solution.push(getItems(name))
+        }
                 
         return this
     },
@@ -141,7 +140,7 @@ export default {
                             return _.reduceRight(res[1], (result: Array<Object>, o1: any) => {
                                 aux = o1[accessor1]
                                 if(_.has(index, aux)) 
-                                    return _.map(index[aux], o0 => _.assign({}, o0, o1)).concat(result)
+                                    return _.map(index[aux], o0 => _.assign({}, _.omit(o0, accessor0), _.omit(o1, accessor1))).concat(result)
                                 return result
                             }, [])
                         }
@@ -149,7 +148,7 @@ export default {
                         return _.reduceRight(res[0], (result: Array<Object>, o0: any) => {
                             aux = o0[accessor0]
                             if(_.has(index, aux)) 
-                                return _.map(index[aux], o1 => _.assign({}, o0, o1)).concat(result)
+                                return _.map(index[aux], o1 => _.assign({}, _.omit(o0, accessor0), _.omit(o1, accessor1))).concat(result)
                             return result
                         }, [])
                     }
@@ -159,37 +158,26 @@ export default {
     },
     then: function (result: Function | null, reject: Function | null) {
         let promise: Promise<string | Array<Object>> = solution[0]
-        if(error) {
-            if(reject) {
-                promise = reject(error)
-            }
-            else {
-                promise = Promise.reject(error)
-            }      
+        if(result && reject) {
+            promise = solution[0]
+                .then((res: any) => {
+                    return result(res)
+                }, (err: Error) => {
+                    return reject(err)
+                })
         }
-        else {
-            if(result && reject) {
-                promise = solution[0]
-                    .then((res: any) => {
-                        return result(res)
-                    }, (err: Error) => {
-                        return reject(err)
-                    })
-            }
-            else if (result) {
-                promise = solution[0]
-                    .then((res: any) => {
-                        return result(res)
-                    })
-            }
-            else if (reject) {
-                promise = solution[0]
-                    .catch((err: Error) => {
-                        return reject(err)
-                    })
-            }
+        else if (result) {
+            promise = solution[0]
+                .then((res: any) => {
+                    return result(res)
+                })
         }
-        error = undefined
+        else if (reject) {
+            promise = solution[0]
+                .catch((err: Error) => {
+                    return reject(err)
+                })
+        }
         solution = []
         return promise
     }
