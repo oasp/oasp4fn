@@ -100,11 +100,12 @@ export default {
             })
         return this
     },
-    reduce: function (iteratee: _.ObjectIterator<Object, any>, accumulator: Array<any> | Object | number) {
+    reduce: function (iteratee: _.ObjectIterator<Object, any>, accumulator?: Array<any> | Object | number) {
+        let _accumulator = accumulator ? accumulator : []
         if(solution[0])
             solution[0] = solution[0].then((res: _.Dictionary<string>) => {
                 if(Array.isArray(res))
-                    return _.reduceRight(res, iteratee, accumulator)
+                    return _.reduceRight(res, iteratee, _accumulator)
                 return Promise.reject('Invalid use of each operation')
             })
         return this
