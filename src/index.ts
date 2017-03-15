@@ -1,7 +1,6 @@
 
 import db from './data-collector'
 
-
 db.table('employees')
     .then((res: Array<Object>) => {
         console.log('Table employees')
@@ -19,7 +18,7 @@ db.table('departments')
     })
 
 db.insert('employees', {id: "5", firstname: "Pepe", surname: "Chocolatero", department: "1"})
-    .then((res: Array<Object>) => {
+    .then((res: string) => {
         console.log('\nInsert of the employee: {id: "5", firstname: "Pepe", surname: "Chocolatero", department: "1"}')
         console.log(res)
     }, (err: Error) => {
@@ -27,7 +26,7 @@ db.insert('employees', {id: "5", firstname: "Pepe", surname: "Chocolatero", depa
     })
 
 db.delete('employees', '1')
-    .then((res: Array<Object>) => {
+    .then((res: string) => {
         console.log('\nDelete of the employee with id 1')
         console.log(res)
     }, (err: Error) => {
@@ -59,7 +58,7 @@ db.table('departments')
         return result
     })
     .count()
-    .then((res: Array<Object>) => {
+    .then((res: number) => {
         console.log('\nThe number of departments that are located in 2 different floors')
         console.log(res)
     }, (err: Error) => {
