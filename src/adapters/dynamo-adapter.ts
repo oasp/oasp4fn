@@ -17,14 +17,12 @@ export function getItem (table_name: string, id: string) {
         promise = getKey(table_name)
 
     return promise.then((res: any) => {
-      console.log(tables)
       params.Key = Object.defineProperty(params.Key, tables[table_name], {
           enumerable: true,
           configurable: true,
           writable: true,
           value: id
         })
-        console.log(params)
       return docClient.get(params).promise()
               .then((res: any) => {
                 return res.Item
