@@ -183,6 +183,6 @@ export default {
         return promise
     },
     promise: function () {
-        return solution[0]
+        return solution.shift()
     }
 }
