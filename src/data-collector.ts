@@ -21,7 +21,7 @@ export default {
                 
         return this
     },
-    where: function (attribute: string, value?: string | number, comparator?: string) {
+    where: function (attribute: string, value?: string | number |boolean, comparator?: string) {
         let _comparator = comparator || '='
         
         if(solution[0])
