@@ -177,7 +177,7 @@ export function deleteItem (table_name: string, id: string) {
             .then((res: any) => {
               if(res.Attributes === undefined)
                 return Promise.reject('The item with id: ' + id + ' doesn\'t exist')
-              return res.Attributes[tables[table_name]]
+              return res.Attributes
             }, (err: Error) => {
               return Promise.reject(err)
             })
