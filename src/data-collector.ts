@@ -21,13 +21,13 @@ export default {
                 
         return this
     },
-    where: function (attribute: string, value?: string | number |boolean, comparator?: string) {
+    where: function (attribute: string, value?: string | number | boolean, comparator?: string) {
         let _comparator = comparator || '='
         
         if(solution[0])
             solution[0] = solution[0].then((res: Array<Object>) => {
                 if(Array.isArray(res)) { 
-                    if(value) {
+                    if(typeof value !== "undefined") {
                         switch(_comparator) {
                             case '=':
                                 return _.filter(res, [attribute, value])
