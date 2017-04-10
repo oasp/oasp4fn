@@ -1,6 +1,6 @@
 import * as _ from 'lodash'
 // import { getItems, getItem, putItem, putItems, deleteItem, deleteItems} from './adapters/mock-adapter'
-import { getItems, getItem, putItem, putItems, deleteItem, deleteItems} from './adapters/dynamo-adapter'
+import { getItems, getItem, putItem, putItems, deleteItem, deleteItems} from './adapters/fn-dynamo'
 
 let solution: Array<Promise<Array<Object> | Object | string | number>> = []
 
