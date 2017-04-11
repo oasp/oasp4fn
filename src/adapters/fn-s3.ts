@@ -1,4 +1,3 @@
-import { access } from 'fs';
 import * as AWS from 'aws-sdk'
 import * as _ from 'lodash'
 
@@ -6,7 +5,7 @@ AWS.config.region = "us-west-2"
 
 const s3 = new AWS.S3()
 
-export function getObject(bucket: string, id: string){
+export function getObject(bucket: string, id: string) {
      return s3.getObjectTorrent({ Bucket: bucket, Key: id }).promise()
          .then((res: AWS.S3.GetObjectTorrentOutput) => {
             return res.Body
@@ -15,7 +14,7 @@ export function getObject(bucket: string, id: string){
          })
 }
 
-export function listObjects(bucket: string){
+export function listObjects(bucket: string) {
     return s3.listObjectsV2({ Bucket: bucket }).promise()
         .then((res: AWS.S3.ListObjectsV2Output) => {
             // let truncated = res.IsTruncated
@@ -94,6 +93,7 @@ export function deleteObjects(bucket: string, ids: Array<string>){
                 accumulator.push(o.Key)
                 return accumulator
             }, [])
+            return result
         }, (err: Error) => {
             return Promise.reject(err)
         })

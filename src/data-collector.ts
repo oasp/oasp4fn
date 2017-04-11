@@ -1,6 +1,7 @@
 import * as _ from 'lodash'
 // import { getItems, getItem, putItem, putItems, deleteItem, deleteItems} from './adapters/mock-adapter'
 import { getItems, getItem, putItem, putItems, deleteItem, deleteItems} from './adapters/fn-dynamo'
+import { getObject, listObjects, putObject, deleteObject, deleteObjects} from './adapters/fn-s3'
 
 let solution: Array<Promise<Array<Object> | Object | string | number>> = []
 
@@ -100,6 +101,24 @@ export default {
             })
         return this
     },
+    map: function (iteratee: _.ObjectIterator<Object, any>) {
+        if(solution[0])
+            solution[0] = solution[0].then((res: Array<Object>) => {
+                if(Array.isArray(res))
+                    return _.map(res, iteratee)
+                return Promise.reject('Invalid use of map operation')
+            })
+        return this
+    },
+    filter: function (iteratee: _.ObjectIterator<Object, any>) {
+        if(solution[0])
+            solution[0] = solution[0].then((res: Array<Object>) => {
+                if(Array.isArray(res))
+                    return _.filter(res, iteratee)
+                return Promise.reject('Invalid use of filter operation')
+            })
+        return this
+    },
     reduce: function (iteratee: _.ObjectIterator<Object, any>, accumulator?: Array<any> | Object | number) {
         let _accumulator = accumulator ? accumulator : []
         if(solution[0])
@@ -155,6 +174,27 @@ export default {
                     }
                     return Promise.reject('Invalid use of function join')
                 }))
+        return this
+    },
+    bucket: function (bucket_name: string, id?: string) {
+        if(id)
+            solution[0] = getObject(bucket_name, id)
+        else
+            solution[0] = listObjects(bucket_name)
+
+        return this
+    },
+    upload: function (bucket_name: string, id: string, buffer: Buffer, mimetype?: string, access?: string) {
+        solution[0] = putObject(bucket_name, id, buffer, mimetype, access)
+
+        return this
+    },
+    deleteObject: function (bucket_name: string, ids: string | Array<string>){
+        if(Array.isArray(ids))
+            solution[0] = deleteObjects(bucket_name, ids)
+        else
+            solution[0] = deleteObject(bucket_name, ids)
+
         return this
     },
     then: function (result: Function | null, reject: Function | null) {
