@@ -1,7 +1,10 @@
 
-import db from './data-collector'
+import fn from './data-collector'
+import * as dynamo from './adapters/fn-dynamo'
 
-db.table('employees')
+fn.setDB(dynamo)
+
+fn.table('employees')
     .then((res: Array<Object>) => {
         console.log('Table employees')
         console.log(res)
@@ -9,7 +12,7 @@ db.table('employees')
         console.log(err)
     })
 
-db.table('departments')
+fn.table('departments')
     .then((res: Array<Object>) => {
         console.log('\nTable departments')
         console.log(res)
@@ -17,7 +20,7 @@ db.table('departments')
         console.log(err)
     })
 
-db.insert('employees', {id: "5", firstname: "Pepe", surname: "Chocolatero", department: "1"})
+fn.insert('employees', {id: "5", firstname: "Pepe", surname: "Chocolatero", department: "1"})
     .then((res: string) => {
         console.log('\nInsert of the employee: {id: "5", firstname: "Pepe", surname: "Chocolatero", department: "1"}')
         console.log(res)
@@ -25,7 +28,7 @@ db.insert('employees', {id: "5", firstname: "Pepe", surname: "Chocolatero", depa
         console.log(err)
     })
 
-db.delete('employees', '1')
+fn.delete('employees', '1')
     .then((res: string) => {
         console.log('\nDelete of the employee with id 1')
         console.log(res)
@@ -33,7 +36,7 @@ db.delete('employees', '1')
         console.log(err)
     })
 
-db.table('employees')
+fn.table('employees')
     .then((res: Array<Object>) => {
         console.log('\nThe table employees after the insert and delete')
         console.log(res)
@@ -41,7 +44,7 @@ db.table('employees')
         console.log(err)
     })
 
-db.table('employees')
+fn.table('employees')
     .table('departments')
     .join('department', 'id')
     .then((res: Array<Object>) => {
@@ -51,7 +54,7 @@ db.table('employees')
         console.log(err)
     })
 
-db.table('departments')
+fn.table('departments')
     .reduce((result: Array<any>, o: any) => {
         if (o.floor.length === 2)
             result.push(o) 
@@ -65,7 +68,7 @@ db.table('departments')
         console.log(err)
     })
 
-db.table('employees')
+fn.table('employees')
     .reduce((result: Array<any>, o: any) => {
         if (o.firstname[0] === 'P' || o.firstname[0] === 'p')
             result.push(o) 
@@ -80,7 +83,7 @@ db.table('employees')
         console.log(err)
     })
     
-db.table('employees')
+fn.table('employees')
     .table('departments')
     .join('department', 'id')
     .where('dept_name', 'Logistic')

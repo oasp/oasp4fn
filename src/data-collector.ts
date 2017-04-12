@@ -1,23 +1,32 @@
 import * as _ from 'lodash'
+import {FnDBService, FnStorageService } from './types'
 // import { getItems, getItem, putItem, putItems, deleteItem, deleteItems} from './adapters/mock-adapter'
-import { getItems, getItem, putItem, putItems, deleteItem, deleteItems} from './adapters/fn-dynamo'
-import { getObject, listObjects, putObject, deleteObject, deleteObjects} from './adapters/fn-s3'
+// import /*{ getItems, getItem, putItem, putItems, deleteItem, deleteItems}*/ * as db from './adapters/fn-dynamo'
+let db: FnDBService /*= require('./adapters/fn-dynamo')*/
+let storage: FnStorageService /*= require('./adapters/fn-s3')*/
+// import /*{ getObject, listObjects, putObject, deleteObject, deleteObjects}*/ * as storage from './adapters/fn-s3'
 
 let solution: Array<Promise<Array<Object> | Object | string | number>> = []
 
 export default {
+    setDB: function (db_service: FnDBService) {
+        db = db_service
+    },
+    setStorage: function (storage_service: FnStorageService) {
+        storage = storage_service
+    },
     table: function (name: string, ids?: string | Array<string>) {
         switch(typeof ids) {
             case "string":
-                solution.push(getItem(name, <string>ids))
+                solution.push(db.getItem(name, <string>ids))
                 break
             case "object":
                 if(Array.isArray(ids)) {
-                    solution.push(getItems(name, ids))
+                    solution.push(db.getItems(name, ids))
                     break
                 }
             default:
-                solution.push(getItems(name))
+                solution.push(db.getItems(name))
         }
                 
         return this
@@ -131,17 +140,17 @@ export default {
     },
     insert: function (table_name: string, items: Object | Array<Object>) {
         if(Array.isArray(items))
-            solution[0] = putItems(table_name, items)
+            solution[0] = db.putItems(table_name, items)
         else
-            solution[0] = putItem(table_name, items)
+            solution[0] = db.putItem(table_name, items)
 
         return this
     },
     delete: function (table_name: string, ids: string | Array<string>) {
          if(Array.isArray(ids))
-            solution[0] = deleteItems(table_name, ids)
+            solution[0] = db.deleteItems(table_name, ids)
         else
-            solution[0] = deleteItem(table_name, ids)
+            solution[0] = db.deleteItem(table_name, ids)
 
         return this
     },
@@ -178,22 +187,22 @@ export default {
     },
     bucket: function (bucket_name: string, id?: string) {
         if(id)
-            solution[0] = getObject(bucket_name, id)
+            solution[0] = storage.getObject(bucket_name, id)
         else
-            solution[0] = listObjects(bucket_name)
+            solution[0] = storage.listObjects(bucket_name)
 
         return this
     },
     upload: function (bucket_name: string, id: string, buffer: Buffer, mimetype?: string, access?: string) {
-        solution[0] = putObject(bucket_name, id, buffer, mimetype, access)
+        solution[0] = storage.putObject(bucket_name, id, buffer, mimetype, access)
 
         return this
     },
     deleteObject: function (bucket_name: string, ids: string | Array<string>){
         if(Array.isArray(ids))
-            solution[0] = deleteObjects(bucket_name, ids)
+            solution[0] = storage.deleteObjects(bucket_name, ids)
         else
-            solution[0] = deleteObject(bucket_name, ids)
+            solution[0] = storage.deleteObject(bucket_name, ids)
 
         return this
     },

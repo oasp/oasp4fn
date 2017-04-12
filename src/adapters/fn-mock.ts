@@ -14,6 +14,10 @@ let departments = [
     {id: "4", dept_name: "UX", floor: [4, 5, 6]}
 ]
 
+let sample_bucket = [ 
+    { Key: "Project info.docx", }
+    ]
+
 export function getItem (table_name: string, id: string) {
     let item: any
     switch(table_name) {
