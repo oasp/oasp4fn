@@ -1,6 +1,6 @@
 # OASP4fn
 
-Oasp4fn will help you to develop your javascript cloud backend in a fast and easy way, thanks to his intuitive API and his query-style usage. You only have to choose the services you want to use with your desired options and it will ready to use.
+Oasp4fn will help you to develop your javascript cloud backend in a fast and easy way, thanks to his intuitive API and his query-style usage. You only have to choose the services you want to use with your desired options and it will be ready to use.
 
 ## Samples
 

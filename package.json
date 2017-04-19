@@ -1,24 +1,27 @@
 {
   "name": "oasp4fn",
   "version": "1.0.0",
-  "main": "Out/src/index.js",
+  "main": "out/src/index.js",
   "scripts": {
     "build": "tsc",
+    "dev": "tsc -w",
     "start": "node out/src/samples.js",
     "test": "mocha --opts mocha.opts",
-    "test:auto": "mocha --opts mocha.opts --watch"
+    "test:auto": "mocha --opts mocha.opts --watch",
+    "prepublish": "npm run build"
   },
+  "keywords": ["cloud", "serverless", "aws", "dynamo", "s3", "oasp"],
   "author": "",
-  "license": "ISC",
+  "license": "Apache-2.0",
   "devDependencies": {
     "@types/chai": "^3.4.35",
     "@types/lodash": "^4.14.53",
     "@types/mocha": "^2.2.39",
     "@types/node": "^7.0.5",
-    "aws-sdk": "^2.12.0",
     "chai": "^3.5.0"
   },
   "dependencies": {
+    "aws-sdk": "^2.12.0",
     "lodash": "^4.17.4"
   }
 }
