@@ -8,7 +8,7 @@ Oasp4fn will help you to develop your javascript cloud backend in a fast and eas
 
 ```javascript 
 import fn from 'oasp4fn'
-import * as dynamo from 'oasp4fn/adapters/fn-dynamo'
+import * as dynamo from 'oasp4fn/out/adapters/fn-dynamo'
 
 fn.setDB(dynamo, {endpoint: "https://dynamodb.us-west-2.amazonaws.com"})
 
@@ -31,7 +31,7 @@ fn.table('employees')
     
 ```javascript  
 import fn from 'oasp4fn'
-import * as s3 from 'oasp4fn/adapters/fn-s3'
+import * as s3 from 'oasp4fn/out/adapters/fn-s3'
 
 fn.setStorage(s3)
 

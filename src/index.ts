@@ -1,23 +1,24 @@
 import * as _ from 'lodash'
-import {FnDBService, FnStorageService } from './types'
+ import { FnDBService} from './adapters/fn-db'
+import { FnStorageService } from './adapters/fn-storage'
 // import { getItems, getItem, putItem, putItems, deleteItem, deleteItems} from './adapters/mock-adapter'
 // import /*{ getItems, getItem, putItem, putItems, deleteItem, deleteItems}*/ * as db from './adapters/fn-dynamo'
 let db: FnDBService /*= require('./adapters/fn-dynamo')*/
 let storage: FnStorageService /*= require('./adapters/fn-s3')*/
 // import /*{ getObject, listObjects, putObject, deleteObject, deleteObjects}*/ * as storage from './adapters/fn-s3'
 
-let solution: Array<Promise<Array<Object> | Object | string | number>> = []
+let solution: Array<Promise<object[] | object | string | number>> = []
 
 export default {
-    setDB: function (db_service: FnDBService, options?: Object) {
+    setDB: function (db_service: FnDBService, options?: object) {
         db = db_service
         db.instance(options)
     },
-    setStorage: function (storage_service: FnStorageService, options?: Object) {
+    setStorage: function (storage_service: FnStorageService, options?: object) {
         storage = storage_service
         storage.instance(options)
     },
-    table: function (name: string, ids?: string | Array<string>) {
+    table: function (name: string, ids?: string | string[]) {
         switch(typeof ids) {
             case "string":
                 solution.push(db.getItem(name, <string>ids))
@@ -37,7 +38,7 @@ export default {
         let _comparator = comparator || '='
         
         if(solution[0])
-            solution[0] = solution[0].then((res: Array<Object>) => {
+            solution[0] = solution[0].then((res: Array<object>) => {
                 if(Array.isArray(res)) { 
                     if(typeof value !== "undefined") {
                         switch(_comparator) {
@@ -71,7 +72,7 @@ export default {
         let _order = (order === 'asc' || order === 'desc') ? order : 'asc'
 
         if(solution[0])
-            solution[0] = solution[0].then((res: Array<Object>) => {
+            solution[0] = solution[0].then((res: Array<object>) => {
                 if(Array.isArray(res)) 
                    return _.orderBy(res, attribute, _order)
                 return Promise.reject('Invalid use of orderBy operation')
@@ -79,11 +80,11 @@ export default {
 
         return this
     },
-    first: function(quantity?: number) {
+    first: function (quantity?: number) {
         let _quantity = (quantity && quantity > 1) ? quantity : 1
 
         if(solution[0])
-            solution[0] = solution[0].then((res: Array<Object>) => {
+            solution[0] = solution[0].then((res: Array<object>) => {
                 if(Array.isArray(res)) 
                    return _.slice(res, 0, _quantity)
                 return Promise.reject('Invalid use of first operation')
@@ -93,18 +94,18 @@ export default {
     },
     count: function () {
         if(solution[0])
-            solution[0] = solution[0].then((res: Array<Object>) => {
+            solution[0] = solution[0].then((res: Array<object>) => {
                 if(Array.isArray(res))
                     return res.length
                 return Promise.reject('Invalid use of count operation')
             })
         return this
     },
-    project: function (...attributes: Array<string | Array<string>>) {
+    project: function (...attributes: Array<string | string[]>) {
         if(solution[0])
-            solution[0] = solution[0].then((res: Array<Object>) => {
+            solution[0] = solution[0].then((res: object[]) => {
                 if(Array.isArray(res) && attributes.length > 0)
-                    return _.reduceRight(res, (result: Array<Object>, o: Object) => {
+                    return _.reduceRight(res, (result: object[], o: object) => {
                         result.push(_.pick(o, attributes))
                         return result
                     }, [])
@@ -112,25 +113,25 @@ export default {
             })
         return this
     },
-    map: function (iteratee: _.ObjectIterator<Object, any>) {
+    map: function (iteratee: _.ObjectIterator<object, any>) {
         if(solution[0])
-            solution[0] = solution[0].then((res: Array<Object>) => {
+            solution[0] = solution[0].then((res: object[]) => {
                 if(Array.isArray(res))
                     return _.map(res, iteratee)
                 return Promise.reject('Invalid use of map operation')
             })
         return this
     },
-    filter: function (iteratee: _.ObjectIterator<Object, any>) {
+    filter: function (iteratee: _.ObjectIterator<object, any>) {
         if(solution[0])
-            solution[0] = solution[0].then((res: Array<Object>) => {
+            solution[0] = solution[0].then((res: object[]) => {
                 if(Array.isArray(res))
                     return _.filter(res, iteratee)
                 return Promise.reject('Invalid use of filter operation')
             })
         return this
     },
-    reduce: function (iteratee: _.ObjectIterator<Object, any>, accumulator?: Array<any> | Object | number) {
+    reduce: function (iteratee: _.ObjectIterator<object, any>, accumulator?: any[] | object | number) {
         let _accumulator = accumulator ? accumulator : []
         if(solution[0])
             solution[0] = solution[0].then((res: _.Dictionary<string>) => {
@@ -140,7 +141,7 @@ export default {
             })
         return this
     },
-    insert: function (table_name: string, items: Object | Array<Object>) {
+    insert: function (table_name: string, items: Object | object[]) {
         if(Array.isArray(items))
             solution[0] = db.putItems(table_name, items)
         else
@@ -148,7 +149,7 @@ export default {
 
         return this
     },
-    delete: function (table_name: string, ids: string | Array<string>) {
+    delete: function (table_name: string, ids: string | string[]) {
          if(Array.isArray(ids))
             solution[0] = db.deleteItems(table_name, ids)
         else
@@ -168,7 +169,7 @@ export default {
                         let aux
                         if(length0 < length1) {
                             index = _.groupBy(res[0], accessor0)
-                            return _.reduceRight(res[1], (result: Array<Object>, o1: any) => {
+                            return _.reduceRight(res[1], (result: Array<object>, o1: any) => {
                                 aux = o1[accessor1]
                                 if(_.has(index, aux)) 
                                     return _.map(index[aux], o0 => _.assign({}, _.omit(o0, accessor0), _.omit(o1, accessor1))).concat(result)
@@ -176,7 +177,7 @@ export default {
                             }, [])
                         }
                         index = _.groupBy(res[1], accessor1)
-                        return _.reduceRight(res[0], (result: Array<Object>, o0: any) => {
+                        return _.reduceRight(res[0], (result: object[], o0: any) => {
                             aux = o0[accessor0]
                             if(_.has(index, aux)) 
                                 return _.map(index[aux], o1 => _.assign({}, _.omit(o0, accessor0), _.omit(o1, accessor1))).concat(result)
@@ -200,7 +201,7 @@ export default {
 
         return this
     },
-    deleteObject: function (bucket_name: string, ids: string | Array<string>){
+    deleteObject: function (bucket_name: string, ids: string | string[]){
         if(Array.isArray(ids))
             solution[0] = storage.deleteObjects(bucket_name, ids)
         else
@@ -209,7 +210,7 @@ export default {
         return this
     },
     then: function (result: Function | null, reject: Function | null) {
-        let promise: Promise<string | Array<Object>> = solution[0]
+        let promise: Promise<object[] | object | string | number> = solution[0]
         if(result && reject) {
             promise = solution[0]
                 .then((res: any) => {
