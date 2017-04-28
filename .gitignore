@@ -57,6 +57,7 @@ node_modules/
 
 #Exclude tsc generated files
 out/
+!out/**/*.d.ts
 
 
 # Elastic Beanstalk Files

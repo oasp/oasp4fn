@@ -1,17 +1,40 @@
 {
   "name": "oasp4fn",
+  "description": "The Open Application Standard Platform for node.js and serverless",
   "version": "1.0.0",
-  "main": "out/src/index.js",
+  "author": {
+    "name": "Capgemini",
+    "url": "https://www.capgemini.com/"
+  },
+  "homepage": "http://oasp.io",
+  "contributors": [
+    "David Alfonso <david.alfonso-garcia@capgemini.com>",
+    "Santos Jimenez <santos.jimenez-linares@capgemini.com>"
+  ],
+  "main": "out/index.js",
   "scripts": {
     "build": "tsc",
     "dev": "tsc -w",
-    "start": "node out/src/samples.js",
+    "sample": "node out/samples.js",
     "test": "mocha --opts mocha.opts",
     "test:auto": "mocha --opts mocha.opts --watch",
     "prepublish": "npm run build"
   },
-  "keywords": ["cloud", "serverless", "aws", "dynamo", "s3", "oasp"],
-  "author": "",
+  "keywords": [
+    "cloud",
+    "serverless",
+    "aws",
+    "dynamo",
+    "s3",
+    "oasp"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/oasp/oasp4fn.git"
+  },
+  "bugs": {
+    "url": "https://github.com/oasp/oasp4fn/issues"
+    },
   "license": "Apache-2.0",
   "devDependencies": {
     "@types/chai": "^3.4.35",
@@ -21,7 +44,8 @@
     "chai": "^3.5.0"
   },
   "dependencies": {
-    "aws-sdk": "^2.12.0",
+    "aws-sdk": "2.20.x",
     "lodash": "^4.17.4"
-  }
+  },
+  "types": "out/index.d.ts"
 }

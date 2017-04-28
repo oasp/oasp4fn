@@ -1,6 +1,6 @@
 import fn from './index'
-import * as dynamo from './adapters/fn-dynamo'
-import * as s3 from './adapters/fn-s3'
+import dynamo from './adapters/fn-dynamo'
+import s3 from './adapters/fn-s3'
 import * as fs from 'fs'
 
 // Dynamo

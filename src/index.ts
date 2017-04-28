@@ -1,6 +1,5 @@
 import * as _ from 'lodash'
- import { FnDBService} from './adapters/fn-db'
-import { FnStorageService } from './adapters/fn-storage'
+import { FnDBService, FnStorageService } from '../out/index'
 // import { getItems, getItem, putItem, putItems, deleteItem, deleteItems} from './adapters/mock-adapter'
 // import /*{ getItems, getItem, putItem, putItems, deleteItem, deleteItems}*/ * as db from './adapters/fn-dynamo'
 let db: FnDBService /*= require('./adapters/fn-dynamo')*/
