@@ -109,7 +109,7 @@ export function deleteObjects(bucket: string, ids: Array<string>){
 
 export default {
     instance: function (options: object = {}) {
-    s3 = new AWS.S3(options)
+        s3 = new AWS.S3(options)
     },
     getObject: function (bucket: string, id: string) {
          return s3.getObjectTorrent({ Bucket: bucket, Key: id }).promise()
