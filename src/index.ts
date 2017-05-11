@@ -6,9 +6,10 @@ let db: FnDBService /*= require('./adapters/fn-dynamo')*/
 let storage: FnStorageService /*= require('./adapters/fn-s3')*/
 // import /*{ getObject, listObjects, putObject, deleteObject, deleteObjects}*/ * as storage from './adapters/fn-s3'
 
-let solution: Array<Promise<object[] | object | string | number>> = []
+let solution: Array<Promise<object[] | object | string | number | never>> = []
 
 export default {
+    config: function (configuration: any) {},
     setDB: function (db_service: FnDBService, options?: object) {
         db = db_service
         db.instance(options)
@@ -37,7 +38,7 @@ export default {
         let _comparator = comparator || '='
         
         if(solution[0])
-            solution[0] = solution[0].then((res: Array<object>) => {
+            solution[0] = solution[0].then((res: Array<object>): any => {
                 if(Array.isArray(res)) { 
                     if(typeof value !== "undefined") {
                         switch(_comparator) {
@@ -71,7 +72,7 @@ export default {
         let _order = (order === 'asc' || order === 'desc') ? order : 'asc'
 
         if(solution[0])
-            solution[0] = solution[0].then((res: Array<object>) => {
+            solution[0] = solution[0].then((res: Array<object>): any => {
                 if(Array.isArray(res)) 
                    return _.orderBy(res, attribute, _order)
                 return Promise.reject('Invalid use of orderBy operation')
@@ -83,7 +84,7 @@ export default {
         let _quantity = (quantity && quantity > 1) ? quantity : 1
 
         if(solution[0])
-            solution[0] = solution[0].then((res: Array<object>) => {
+            solution[0] = solution[0].then((res: Array<object>): any => {
                 if(Array.isArray(res)) 
                    return _.slice(res, 0, _quantity)
                 return Promise.reject('Invalid use of first operation')
@@ -93,7 +94,7 @@ export default {
     },
     count: function () {
         if(solution[0])
-            solution[0] = solution[0].then((res: Array<object>) => {
+            solution[0] = solution[0].then((res: Array<object>): any => {
                 if(Array.isArray(res))
                     return res.length
                 return Promise.reject('Invalid use of count operation')
@@ -102,7 +103,7 @@ export default {
     },
     project: function (...attributes: Array<string | string[]>) {
         if(solution[0])
-            solution[0] = solution[0].then((res: object[]) => {
+            solution[0] = solution[0].then((res: object[]): any => {
                 if(Array.isArray(res) && attributes.length > 0)
                     return _.reduceRight(res, (result: object[], o: object) => {
                         result.push(_.pick(o, attributes))
@@ -114,7 +115,7 @@ export default {
     },
     map: function (iteratee: _.ObjectIterator<object, any>) {
         if(solution[0])
-            solution[0] = solution[0].then((res: object[]) => {
+            solution[0] = solution[0].then((res: object[]): any => {
                 if(Array.isArray(res))
                     return _.map(res, iteratee)
                 return Promise.reject('Invalid use of map operation')
@@ -123,7 +124,7 @@ export default {
     },
     filter: function (iteratee: _.ObjectIterator<object, any>) {
         if(solution[0])
-            solution[0] = solution[0].then((res: object[]) => {
+            solution[0] = solution[0].then((res: object[]): any => {
                 if(Array.isArray(res))
                     return _.filter(res, iteratee)
                 return Promise.reject('Invalid use of filter operation')
@@ -158,7 +159,7 @@ export default {
     },
     join: function (accessor0: string, accessor1: string) {
         solution.unshift(Promise.all(_.pullAt(solution, [0, 1]))
-                .then((res: Array<any>) => {
+                .then((res: any[]): any => {
                     if(Array.isArray(res[0]) && Array.isArray(res[1])) {
                         let length0 = res[0].length
                         let length1 = res[1].length

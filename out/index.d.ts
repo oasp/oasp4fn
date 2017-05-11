@@ -1,3 +1,4 @@
+import { Environment } from 'aws-sdk/clients/lambda';
 
 interface Oasp4Fn {
     /**
@@ -206,4 +207,14 @@ export interface FnStorageService {
     putObject: (bucket: string, id: string, buffer: Buffer, mimetype?: string, access?: string) => Promise<string | Error>;
     deleteObject: (bucket: string, id: string) => Promise<string | Error>;
     deleteObjects: (bucket: string, ids: Array<string>) => Promise<Array<string> | Error>
+}
+
+export interface ServerlessConfiguration {
+    integration?: string;
+    path?: string;
+    cors?: true;
+    authorizer?: string | {arn: string, claims?: string[]};
+    response?:  { header: {[name: string]: string}, template?: {[name: string]: string}},
+    statusCodes?: {[code: number]: {pattern: string, header?: {[name: string]: string}, template?: {[name: string]: string}}}
+    
 }
