@@ -2,6 +2,14 @@ import { Environment } from 'aws-sdk/clients/lambda';
 
 interface Oasp4Fn {
     /**
+     * Dummy function, that especifies the event configuration for a serverless function
+     * 
+     * @param {ServerlessConfiguration} configuration 
+     * 
+     * @memberof Oasp4Fn
+     */
+    config(configuration: ServerlessConfiguration): void
+    /**
      * Assingns the data base service, with his options, to use in the module
      * 
      * @param {FnDBService} db_service 

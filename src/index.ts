@@ -1,5 +1,5 @@
 import * as _ from 'lodash'
-import { FnDBService, FnStorageService } from '../out/index'
+import { FnDBService, FnStorageService, ServerlessConfiguration } from '../out/index'
 // import { getItems, getItem, putItem, putItems, deleteItem, deleteItems} from './adapters/mock-adapter'
 // import /*{ getItems, getItem, putItem, putItems, deleteItem, deleteItems}*/ * as db from './adapters/fn-dynamo'
 let db: FnDBService /*= require('./adapters/fn-dynamo')*/
@@ -9,7 +9,7 @@ let storage: FnStorageService /*= require('./adapters/fn-s3')*/
 let solution: Array<Promise<object[] | object | string | number | never>> = []
 
 export default {
-    config: function (configuration: any) {},
+    config: function (configuration: ServerlessConfiguration) {},
     setDB: function (db_service: FnDBService, options?: object) {
         db = db_service
         db.instance(options)

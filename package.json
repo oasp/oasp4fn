@@ -34,7 +34,7 @@
   },
   "bugs": {
     "url": "https://github.com/oasp/oasp4fn/issues"
-    },
+  },
   "license": "Apache-2.0",
   "devDependencies": {
     "@types/chai": "^3.4.35",
@@ -45,7 +45,8 @@
   },
   "dependencies": {
     "aws-sdk": "2.20.x",
-    "lodash": "^4.17.4"
+    "lodash": "^4.17.4",
+    "typescript": "^2.3.2"
   },
   "types": "out/index.d.ts"
 }
