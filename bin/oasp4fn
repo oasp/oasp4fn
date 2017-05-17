@@ -1,0 +1,7 @@
+#!/usr/bin/env node
+
+'use strict';
+
+let yml_gen = require('../out/yml-generator/index');
+
+yml_gen.run();

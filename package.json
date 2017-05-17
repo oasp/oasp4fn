@@ -9,7 +9,8 @@
   "homepage": "http://oasp.io",
   "contributors": [
     "David Alfonso <david.alfonso-garcia@capgemini.com>",
-    "Santos Jimenez <santos.jimenez-linares@capgemini.com>"
+    "Santos Jimenez <santos.jimenez-linares@capgemini.com>",
+    "Ruben Diaz <ruben.diaz-martinez@capgemini.com>"
   ],
   "main": "out/index.js",
   "scripts": {
@@ -38,6 +39,7 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@types/chai": "^3.4.35",
+    "@types/js-yaml": "^3.5.30",
     "@types/lodash": "^4.14.53",
     "@types/mocha": "^2.2.39",
     "@types/node": "^7.0.5",
@@ -45,8 +47,13 @@
   },
   "dependencies": {
     "aws-sdk": "2.20.x",
+    "js-yaml": "^3.8.4",
     "lodash": "^4.17.4",
     "typescript": "^2.3.2"
+  },
+  "bin": {
+    "oasp4fn": "./bin/oasp4fn",
+    "fun": "./bin/oasp4fn"
   },
   "types": "out/index.d.ts"
 }
