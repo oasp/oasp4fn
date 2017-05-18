@@ -6,8 +6,13 @@ import * as yml from 'js-yaml';
 
 const DEFAULTS = {
     path: 'handlers',
-    provider: {name: 'aws', runtime: 'nodejs6.10', region: 'us-west-2'},
-    plugins: ['serverless-webpack', 'serverless-offline']
+    aws: {
+        provider: {name: 'aws', runtime: 'nodejs6.10', region: 'us-west-2'},
+        plugins: ['serverless-webpack', 'serverless-offline']
+    },
+    azure: {},
+    openwhisk: {},
+    google: {}
 };
 
 const WEBPACK =
@@ -33,24 +38,28 @@ module.exports = {
     externals: [ nodeExternals() ],
     entry: {\n`;
 
-export function run() {
-    let dirs = fs.readdirSync(DEFAULTS.path);
+export function run(opts: any) {
+    let options: any = opts ? defineOptions(opts) : _.create(DEFAULTS.aws, DEFAULTS.path);
+    let dirs = fs.readdirSync(options.path);
     dirs = _.reduceRight(<any>dirs, (accumulator: any, value) => {
-        let aux = `${DEFAULTS.path}${path.sep}${value}`;
+        let aux = `${options.path}${path.sep}${value}`;
         if (fs.statSync(aux).isDirectory())
             accumulator.push(aux);
         return accumulator;
     }, []);
     let files = extractFiles(dirs, []);
     let tscParser: Function;
-    switch (DEFAULTS.provider.name) {
+    switch (options.provider.name) {
         case 'aws':
             tscParser = require('./aws').tscParser;
             break;
+        case 'azure':
+        case 'openwhisk':
+        case 'google':
         default:
             tscParser = require('./aws').tscParser;
     }
-    let serverless_yml = serviceName(DEFAULTS);
+    let serverless_yml = serviceName(options);
     serverless_yml = tscParser(files, serverless_yml);
     generateYaml(serverless_yml);
     generateWebpack(files);
@@ -71,6 +80,19 @@ let extractFiles = (paths: string[], files: string[]): string[] => {
         }, []);
         return extractFiles(_.concat(paths, paths_aux), files);
     }
+};
+
+let defineOptions = (opts: any) => {
+    if (!opts.path)
+        opts.path = DEFAULTS.path;
+    if (opts.provider) {
+        if (typeof opts.provider === 'string') {
+            _.assign(opts, _.get(DEFAULTS, opts.provider));
+        }
+    }
+    else
+        _.assign(opts, _.get(DEFAULTS, 'aws'));
+    return opts;
 };
 
 let serviceName = (obj: any) => {
