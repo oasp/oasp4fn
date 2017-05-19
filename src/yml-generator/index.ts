@@ -10,9 +10,17 @@ const DEFAULTS = {
         provider: {name: 'aws', runtime: 'nodejs6.10', region: 'us-west-2'},
         plugins: ['serverless-webpack', 'serverless-offline']
     },
-    azure: {},
-    openwhisk: {},
-    google: {}
+    azure: {
+        provider: {name: 'azure', location: 'West US'},
+        plugins: ['serverless-azure-functions']
+    },
+    openwhisk: {
+        provider: {name: 'openwhisk', ignore_certs: true}
+    },
+    google: {
+        provider: {name: 'google'},
+        plugins: ['serverless-google-cloudfunctions']
+    }
 };
 
 const WEBPACK =
@@ -39,7 +47,9 @@ module.exports = {
     entry: {\n`;
 
 export function run(opts: any) {
+    console.log(opts);
     let options: any = opts ? defineOptions(opts) : _.create(DEFAULTS.aws, DEFAULTS.path);
+    console.log(options);
     let dirs = fs.readdirSync(options.path);
     dirs = _.reduceRight(<any>dirs, (accumulator: any, value) => {
         let aux = `${options.path}${path.sep}${value}`;
@@ -83,15 +93,23 @@ let extractFiles = (paths: string[], files: string[]): string[] => {
 };
 
 let defineOptions = (opts: any) => {
+    console.log(opts);
     if (!opts.path)
         opts.path = DEFAULTS.path;
     if (opts.provider) {
         if (typeof opts.provider === 'string') {
-            _.assign(opts, _.get(DEFAULTS, opts.provider));
+            let providerObject = <{provider: object}>_.get(DEFAULTS, opts.provider);
+            opts.provider =  providerObject.provider;
+            _.assignWith(opts, providerObject, (objValue, srcValue) => {
+                return _.isUndefined(objValue) ? srcValue : objValue;
+            });
         }
     }
     else
-        _.assign(opts, _.get(DEFAULTS, 'aws'));
+        _.assignWith(opts, _.get(DEFAULTS, 'aws'), (objValue, srcValue) => {
+            return _.isUndefined(objValue) ? srcValue : objValue;
+        });
+    console.log(opts);
     return opts;
 };
 
