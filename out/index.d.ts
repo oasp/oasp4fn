@@ -28,6 +28,15 @@ interface Oasp4Fn {
      */
     setStorage(db_service: FnStorageService, options?: object): void
     /**
+     * Assigns the authentication service, with his options, to use in the module
+     * 
+     * @param {FnAuthService} auth_service 
+     * @param {object} [options] 
+     * 
+     * @memberof Oasp4Fn
+     */
+    setAuth(auth_service: FnAuthService, options?: object): void
+    /**
      * Function that use the getItems or getItems functionalities to get items of a table with the given name
      * 
      * @param {string} name 
@@ -176,6 +185,27 @@ interface Oasp4Fn {
      */
     deleteObject(bucket_name: string, ids: string | string[]): Oasp4Fn
     /**
+     * Function that performs a login into an application
+     * 
+     * @param {string} user 
+     * @param {string} password 
+     * @param {(string | object)} pool 
+     * @returns {Oasp4Fn} 
+     * 
+     * @memberof Oasp4Fn
+     */
+    login(user: string, password: string, pool: string | object): Oasp4Fn
+    /**
+     * Function that refresh the token/s of a logged user
+     * 
+     * @param {string} refresh_token 
+     * @param {(string | object)} pool 
+     * @returns {Oasp4Fn} 
+     * 
+     * @memberof Oasp4Fn
+     */
+    refresh(refresh_token: string, pool: string | object): Oasp4Fn
+    /**
      * A then override following the promise/A+ open standard requirements
      * 
      * @param {(Function | null)} result 
@@ -217,6 +247,12 @@ export interface FnStorageService {
     deleteObjects: (bucket: string, ids: Array<string>) => Promise<Array<string> | Error>
 }
 
+export interface FnAuthService {
+    instance: (options?: Object) => void;
+    authenticateUser: (user: string, password: string, pool: string | object) => Promise<object | string | Error>;
+    refreshToken: (refresh_token: string, pool: string | object) => Promise<object | string | Error>;
+}
+
 export interface ServerlessConfiguration {
     integration?: string;
     path?: string;
@@ -224,5 +260,4 @@ export interface ServerlessConfiguration {
     authorizer?: string | {arn: string, claims?: string[]};
     response?:  { header: {[name: string]: string}, template?: {[name: string]: string}},
     statusCodes?: {[code: number]: {pattern: string, header?: {[name: string]: string}, template?: {[name: string]: string}}}
-    
 }

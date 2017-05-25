@@ -44,12 +44,11 @@ module.exports = {
         filename: '[name].js'
     },
     externals: [ nodeExternals() ],
-    entry: {\n`;
+    entry: {
+`;
 
 export function run(opts: any) {
-    console.log(opts);
-    let options: any = opts ? defineOptions(opts) : _.create(DEFAULTS.aws, DEFAULTS.path);
-    console.log(options);
+    let options: any = opts ? defineOptions(opts) : _.assign({}, DEFAULTS.aws, { path: DEFAULTS.path });
     let dirs = fs.readdirSync(options.path);
     dirs = _.reduceRight(<any>dirs, (accumulator: any, value) => {
         let aux = `${options.path}${path.sep}${value}`;
@@ -67,11 +66,12 @@ export function run(opts: any) {
         case 'openwhisk':
         case 'google':
         default:
-            tscParser = require('./aws').tscParser;
+            throw `The service ${options.provider.name} isn't valid. Please, for more information, run "oasp4fn --help"`;
     }
-    let serverless_yml = serviceName(options);
-    serverless_yml = tscParser(files, serverless_yml);
-    generateYaml(serverless_yml);
+    serviceName(options);
+    let serverless_yml = tscParser(files, options);
+    generateApp(serverless_yml);
+    generateYaml(_.omit(serverless_yml, ['imports', 'routes']));
     generateWebpack(files);
 }
 
@@ -93,7 +93,6 @@ let extractFiles = (paths: string[], files: string[]): string[] => {
 };
 
 let defineOptions = (opts: any) => {
-    console.log(opts);
     if (!opts.path)
         opts.path = DEFAULTS.path;
     if (opts.provider) {
@@ -109,7 +108,6 @@ let defineOptions = (opts: any) => {
         _.assignWith(opts, _.get(DEFAULTS, 'aws'), (objValue, srcValue) => {
             return _.isUndefined(objValue) ? srcValue : objValue;
         });
-    console.log(opts);
     return opts;
 };
 
@@ -118,7 +116,6 @@ let serviceName = (obj: any) => {
         let dirs = process.cwd().split(path.sep);
         obj.service = dirs[dirs.length - 1];
     }
-    return _.omit(obj, 'path');
 };
 
 let generateYaml = (obj: any) => {
@@ -145,6 +142,36 @@ let generateWebpack = (files: any) => {
         else {
             console.log('webpack.config.json created succesfully');
             console.log(out);
+        }
+    });
+};
+
+let generateApp = (obj: any) => {
+    let app =
+`
+import * as express from 'express';
+import * as cors from 'cors';
+${_.trim(obj.imports)}
+
+let app = express();
+app.set('port', process.env.PORT || 3000);
+
+app.use(cors());
+app.options('*', cors());
+
+${_.trim(obj.routes)}
+
+app.listen(app.get('port'), () => {
+    console.log('Conveyor server listening on port ' + app.get('port'));
+});
+`;
+
+    fs.writeFile(`${DEFAULTS.path}/app.ts`, app, (err) => {
+        if (err)
+            console.log('Error creating app.ts');
+        else {
+            console.log('app.ts created succesfully');
+            console.log(app);
         }
     });
 };

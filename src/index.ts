@@ -1,7 +1,8 @@
 import * as _ from 'lodash';
-import { FnDBService, FnStorageService, ServerlessConfiguration } from '../out/index';
+import { FnDBService, FnStorageService, ServerlessConfiguration, FnAuthService } from '../out/index';
 let db: FnDBService;
 let storage: FnStorageService;
+let auth: FnAuthService;
 
 let solution: Array<Promise<object[] | object | string | number | never>> = [];
 
@@ -14,6 +15,10 @@ export default {
     setStorage: function (storage_service: FnStorageService, options?: object) {
         storage = storage_service;
         storage.instance(options);
+    },
+    setAuth: function (auth_service: FnAuthService, options?: object) {
+        auth = auth_service;
+        auth.instance(options);
     },
     table: function (name: string, ids?: string | string[]) {
         switch (typeof ids) {
@@ -203,6 +208,16 @@ export default {
             solution[0] = storage.deleteObjects(bucket_name, ids);
         else
             solution[0] = storage.deleteObject(bucket_name, ids);
+
+        return this;
+    },
+    login: function (user: string, password: string, pool: string | object) {
+        solution[0] = auth.authenticateUser(user, password, pool);
+
+        return this;
+    },
+    refresh: function (refresh_token: string, pool: string | object) {
+        solution[0] = auth.refreshToken(refresh_token, pool);
 
         return this;
     },

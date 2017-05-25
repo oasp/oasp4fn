@@ -1,12 +1,14 @@
-import { inflateRawSync } from 'zlib';
-
 import { readFileSync } from 'fs';
 import * as _ from 'lodash';
 import * as ts from 'typescript';
 
 const DEFAULTS = {
+    path: 'handlers',
     http: { integration: 'lambda', cors: true, name: (name: string) => { return {method: name}; } },
     s3: { name: (name: string) => { return {event: _.get({created: 's3:ObjectCreated:*', removed: 's3:ObjectRemoved:*'}, name)}; }},
+    sns: { name: (name: string) => { return { topicName: name }; }},
+    alexaskill: { name: (name: string) => name },
+    stream: { name: (name: string) => {return { type: name }; }},
     iamRoleStatements: [
         {
             Effect: 'Allow',
@@ -26,7 +28,9 @@ const DEFAULTS = {
 };
 
 export function tscParser (files: string[], yml: any) {
-    yml.functions = {};
+    ymlOptions(yml);
+    yml.imports = ``;
+    yml.routes = ``;
     _.forEachRight(files, (file) => {
          let sourceFile = ts.createSourceFile(file, readFileSync(file).toString(), ts.ScriptTarget.ES2016, false);
          let fileName = sourceFile.fileName;
@@ -49,6 +53,8 @@ export function tscParser (files: string[], yml: any) {
                      break;
              }
              if (i === total) {
+                 if (_.get(fn_obj, 'event') === 'http')
+                    addToApp(fn_obj, yml);
                 addHandler(fn_obj, yml);
              }
          });
@@ -57,17 +63,37 @@ export function tscParser (files: string[], yml: any) {
     return yml;
 }
 
+let ymlOptions = (yml: any) => {
+    DEFAULTS.path = _.endsWith(yml.path, '/') ? yml.path : `${yml.path}/`;
+    _.unset(yml, 'path');
+
+    if (yml.events) {
+        _.forEachRight(yml.events, (event, key) => {
+            if (_.has(DEFAULTS, <string>key)) {
+                if (!event.name || typeof event.name !== 'function') {
+                    _.set(event, 'name', (<{name: string}>_.get(DEFAULTS, <string>key)).name);
+                }
+            }
+                _.set(DEFAULTS, <string>key, event);
+        });
+        _.unset(yml, 'events');
+    }
+
+    if (yml.iamRoleStatements) {
+        DEFAULTS.iamRoleStatements = yml.iamRoleStatements;
+        _.unset(yml, 'iamRoleStatements');
+    }
+
+    yml.functions = {};
+};
+
 let searchEvent = (path: string, obj: any) => {
-    let folders = path.split('/');
-    _.some(folders, (folder, i, collection) => {
-        let event: any = _.get(DEFAULTS, _.toLower(folder));
-        if (event) {
-            obj.event = _.toLower(folder);
-            event = _.omit(_.assign(event, event.name(_.toLower(collection[i + 1]))), 'name');
-            _.assign(obj.oasp4fn.events,  event);
-        }
-        return event;
-    });
+    let folders = _.split(_.trimStart(path, DEFAULTS.path), '/');
+    obj.event = _.toLower(folders[0]);
+    let event: any = _.get(DEFAULTS, obj.event) || {};
+    if (event.name)
+            event = _.omit(_.assign(event, event.name(_.toLower(folders[1]))), 'name');
+     _.assign(obj.oasp4fn.events,  event);
 };
 
 let importHelper = (child: ts.ImportDeclaration, obj: any) => {
@@ -89,7 +115,13 @@ let expressionHelper = (child: ts.ExpressionStatement, obj: any) => {
         let args = expression.arguments;
         if (args.length > 0) {
             let properties = (<ts.ObjectLiteralExpression>args.shift()).properties;
-            _.assign(obj.oasp4fn.events, _.reduceRight(<any>properties, (accumulator: any, property) => {
+            _.assign(obj.oasp4fn.events, extractConfig(properties, obj));
+        }
+    }
+};
+
+let extractConfig = (properties: any, obj: any) => {
+    return _.reduceRight(<any>properties, (accumulator: any, property) => {
                 let key = (<ts.Identifier>(<ts.PropertyAssignment>property).name).text;
                 let value = (<ts.PropertyAssignment>property).initializer;
 
@@ -110,11 +142,24 @@ let expressionHelper = (child: ts.ExpressionStatement, obj: any) => {
                     case ts.SyntaxKind.Identifier:
                         if ((<ts.Identifier>value).originalKeywordKind === ts.SyntaxKind.UndefinedKeyword)
                             _.unset(obj.oasp4fn.events, key);
+                        break;
+                    case ts.SyntaxKind.ObjectLiteralExpression:
+                        _.set(accumulator, key, extractConfig((<ts.ObjectLiteralExpression>value).properties, obj));
+                        break;
+                    case ts.SyntaxKind.ArrayLiteralExpression:
+                        let elements = (<ts.ArrayLiteralExpression>value).elements;
+                        _.set(accumulator, key, _.reduceRight(<any>elements, (array: any, element) => {
+                            if ((<ts.Expression>element).kind === ts.SyntaxKind.StringLiteral)
+                                array.push((<ts.StringLiteral>element).text);
+                            if ((<ts.Expression>element).kind === ts.SyntaxKind.ObjectLiteralExpression)
+                                array.push(extractConfig((<ts.ObjectLiteralExpression>element).properties, obj));
+
+                            return array;
+                        }, []));
+                        break;
                 }
                 return accumulator;
-            }, {}));
-        }
-    }
+            }, {});
 };
 
 let functionHelper = (child: ts.FunctionDeclaration, obj: any) => {
@@ -131,4 +176,24 @@ let addHandler = (obj: any, yml: any) => {
     obj.oasp4fn.handler = `${obj.oasp4fn.handler}${obj.name}`;
     obj.oasp4fn.events = [_.set({}, obj.event, obj.oasp4fn.events)];
     _.set(yml.functions, obj.name, obj.oasp4fn);
+};
+
+let addToApp = (obj: any, yml: any) => {
+    let path = _.trimEnd(_.trimStart(obj.oasp4fn.handler, DEFAULTS.path), '.');
+    let import_path = `./${path}`;
+    let route = _.replace(_.trimEnd(obj.oasp4fn.events.path, '}'), '{', ':');
+    yml.imports = `
+${yml.imports}
+import { ${obj.name} } from '${import_path}';`;
+    yml.routes = `
+    ${yml.routes}
+app.${obj.oasp4fn.events.method}('/${route}', (req: any, res) => {
+    ${obj.name}(req, {}, (err: Error, result: object) => {
+        if (err)
+            res.json(err);
+        else
+            res.json(result);
+    });
+});
+`;
 };

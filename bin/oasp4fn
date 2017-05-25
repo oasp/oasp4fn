@@ -29,37 +29,30 @@ function logError(msg) {
 }
 
 function oasp4fn() {
-    console.log(process.argv)
     let args = _.slice(process.argv, 2)
     let opts = {}
     try {
     _.some(args, (arg, i, list) => {
-        console.log(arg)
         if(arg){
             switch(arg) {
                 case 'aws':
-                    console.log('aws')
                     break;
                 case '--opts':
                 case '-o':
-                    console.log('opts')
                     _.set(opts, 'config', _.remove(list, (value, j) => {
                         return j === (i + 1)
                     })[0])
                     break;
                 case '--path':
                 case '-p':
-                    console.log('path')
                     _.set(opts, 'path', _.remove(list, (value, j) => {
                         return j === (i + 1)
                     })[0])
                     break;
                 case '--help':
                 case '-h':
-                    console.log('help')
                     throw false
                 default:
-                    console.log('default')
                     throw `The argument "${arg}" isn't valid. Please, for more information, run "oasp4fn --help"`;
             }
         }
@@ -67,7 +60,6 @@ function oasp4fn() {
     })
     if(opts.config) {
         if(fs.existsSync(opts.config)) {
-            console.log('opts.config')
             _.assign(opts, require(`${process.cwd()}${path.sep}${opts.config}`))
             opts = _.omit(opts, 'config')
         }
@@ -75,10 +67,9 @@ function oasp4fn() {
             throw `The options file "${opts.config}" doesn't exist.`
     }
     else if (fs.existsSync("oasp4fn.config.js")) {
-        console.log('No opts.config')
         _.assign(opts, require(`${process.cwd()}${path.sep}oasp4fn.config.js`))
     }
-    console.log(opts)
+    
     _.isEmpty(opts) ? yml_gen.run() : yml_gen.run(opts);
 
     } catch(e) {
