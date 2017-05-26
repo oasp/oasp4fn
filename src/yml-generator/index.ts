@@ -151,6 +151,8 @@ let generateApp = (obj: any) => {
 `
 import * as express from 'express';
 import * as cors from 'cors';
+import * as bodyParser from 'body-parser';
+import * as _ from 'lodash';
 ${_.trim(obj.imports)}
 
 let app = express();
@@ -158,6 +160,7 @@ app.set('port', process.env.PORT || 3000);
 
 app.use(cors());
 app.options('*', cors());
+app.use(bodyParser.json());
 
 ${_.trim(obj.routes)}
 

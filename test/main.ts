@@ -1,16 +1,197 @@
-import { error } from 'util';
-
+import * as AWS from 'aws-sdk';
 import { expect } from 'chai';
-import db from '../src/index';
+import fn from '../src/index';
+import dynamo from '../src/adapters/fn-dynamo';
+let DynamoDB = require('aws-sdk/clients/dynamodb');
+
+let endpoint = process.env.ENDPOINT || 'http://localhost:8000/';
+let region = process.env.REGION || 'us-west-2';
+let dynamodb = new DynamoDB({ endpoint: endpoint, region: region });
+let docClient = new DynamoDB.DocumentClient({ endpoint: endpoint, region: region });
+
+fn.setDB(dynamo, { endpoint: endpoint, region: region });
+
+let employees = [
+    {id: '1', firstname: 'Paquito', surname: 'Chocolatero', department: '1'},
+    {id: '2', firstname: 'Paquita', surname: 'Chocolatera', department: '3'},
+    {id: '3', firstname: 'Paco', surname: 'Chocolatero', department: '1'},
+    {id: '4', firstname: 'Fran', surname: 'Chocolatero', department: '2'}
+];
+
+let departments = [
+    {id: '1', dept_name: 'Logistic', floor: [1, 2]},
+    {id: '2', dept_name: 'RRHH', floor: [3]},
+    {id: '3', dept_name: 'Architecture', floor: [2, 3]},
+    {id: '4', dept_name: 'UX', floor: [4, 5, 6]}
+];
+
+before(/*async*/ (done) => {
+    let creates: Promise<void>[] = [];
+    let inserts: Promise<void>[] = [];
+
+    dynamodb.describeTable({TableName: 'employees'}).promise()
+        .then((res: void) => {
+            creates.push(Promise.resolve());
+        }, (err: {code: string}) => {
+            if (err.code === 'ResourceNotFoundException') {
+                let params = {
+                    TableName : 'employees',
+                    KeySchema: [
+                        { AttributeName: 'id', KeyType: 'HASH'}
+                    ],
+                    AttributeDefinitions: [
+                        { AttributeName: 'id', AttributeType: 'S' }
+                    ],
+                    ProvisionedThroughput: {
+                        ReadCapacityUnits: 1,
+                        WriteCapacityUnits: 1
+                    }
+                };
+                creates.push(dynamodb.createTable(params).promise());
+            }
+            else {
+                done(err);
+            }
+        });
+
+    dynamodb.describeTable({TableName: 'departments'}).promise()
+        .then((res: void) => {
+            creates.push(Promise.resolve());
+        }, (err: {code: string}) => {
+            if (err.code === 'ResourceNotFoundException') {
+                let params = {
+                    TableName : 'departments',
+                    KeySchema: [
+                        { AttributeName: 'id', KeyType: 'HASH'}
+                    ],
+                    AttributeDefinitions: [
+                        { AttributeName: 'id', AttributeType: 'S' }
+                    ],
+                    ProvisionedThroughput: {
+                        ReadCapacityUnits: 1,
+                        WriteCapacityUnits: 1
+                    }
+                };
+                creates.push(dynamodb.createTable(params).promise());
+            }
+            else {
+                done(err);
+            }
+        });
+
+    Promise.all(creates).then((res) => {
+        departments.forEach((department) => {
+            let params = {
+                TableName: 'departments',
+                Item: department
+            };
+            inserts.push(docClient.put(params).promise());
+        });
+        employees.forEach((employee) => {
+            let params = {
+                TableName: 'employees',
+                Item: employee
+            };
+            inserts.push(docClient.put(params).promise());
+        });
+    }, (err: Error) => {
+        done(err);
+    });
+
+    Promise.all(inserts).then((res) => {
+        done();
+    }, (err) => {
+        done(err);
+    });
+
+    /*try {
+        await dynamodb.describeTable({TableName: 'employees'}).promise();
+        creates.push(Promise.resolve());
+    }catch (err) {
+        if (err.code === 'ResourceNotFoundException') {
+            let params = {
+                TableName : 'employees',
+                KeySchema: [
+                    { AttributeName: 'id', KeyType: 'HASH'}
+                ],
+                AttributeDefinitions: [
+                    { AttributeName: 'id', AttributeType: 'S' }
+                ],
+                ProvisionedThroughput: {
+                    ReadCapacityUnits: 1,
+                    WriteCapacityUnits: 1
+                }
+            };
+            creates.push(dynamodb.createTable(params).promise());
+        }
+        else {
+            done(err);
+        }
+    }
+
+    try {
+        await dynamodb.describeTable({TableName: 'departments'}).promise();
+        creates.push(Promise.resolve());
+    }catch (err) {
+        if (err.code === 'ResourceNotFoundException') {
+            let params = {
+                TableName : 'departments',
+                KeySchema: [
+                    { AttributeName: 'id', KeyType: 'HASH'}
+                ],
+                AttributeDefinitions: [
+                    { AttributeName: 'id', AttributeType: 'S' }
+                ],
+                ProvisionedThroughput: {
+                    ReadCapacityUnits: 1,
+                    WriteCapacityUnits: 1
+                }
+            };
+            creates.push(dynamodb.createTable(params).promise());
+        }
+        else {
+            done(err);
+        }
+    }
+
+    try {
+        await Promise.all(creates);
+        departments.forEach((department) => {
+            let params = {
+                TableName: 'departments',
+                Item: department
+            };
+            inserts.push(docClient.put(params).promise());
+        });
+        employees.forEach((employee) => {
+            let params = {
+                TableName: 'employees',
+                Item: employee
+            };
+            inserts.push(docClient.put(params).promise());
+        });
+    }catch (err) {
+        console.log(err)
+        done(err);
+    }
+
+    try {
+        await Promise.all(inserts);
+        done();
+    } catch (err) {
+        console.log(err)
+        done(err);
+    }*/
+});
 
 describe('table', () => {
 
      it('The function should return a reference to the self object', () => {
-         expect(db.table('employees')).to.be.an('object');
-         expect(db.table('employees')).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then']);
+         expect(fn.table('employees')).to.be.an('object');
+         expect(fn.table('employees')).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then']);
      });
      it('If the table exist, the resolution promise should return an Array<Object>', (done: Function) => {
-        db.table('employees').then((res: Array<Object>) => {
+        fn.table('employees').then((res: Array<Object>) => {
             try {
                 expect(res).to.be.an('array');
                 expect(res).to.have.lengthOf(4);
@@ -29,7 +210,7 @@ describe('table', () => {
          done();
      });
      it('If the table doesn\'t exist, the resoluton promise should return an Error', (done: Function) => {
-         db.table('some_table').then((res: Array<Object>) => {
+         fn.table('some_table').then((res: Array<Object>) => {
             try {
                 expect(res).to.be.undefined;
              }
@@ -38,7 +219,7 @@ describe('table', () => {
              }
             }, (err: Error) => {
              try {
-                expect(err).to.be.a('string');
+                expect(err).to.not.be.null;
              }
              catch (err) {
                  done(err);
@@ -47,7 +228,7 @@ describe('table', () => {
          done();
      });
      it('If an id is passed along with the name of the table, the corresponding item will be returned', (done: Function) => {
-         db.table('departments', '1')
+         fn.table('departments', '1')
              .then((res: Object) => {
                  try {
                  expect(res).to.be.an('object');
@@ -67,7 +248,7 @@ describe('table', () => {
              done();
      });
      it('If an array of id\'s is passed along with the name of the table, the corresponding list of items will be returned', (done: Function) => {
-             db.table('departments', ['1', '3', '4'])
+             fn.table('departments', ['1', '3', '4'])
                  .then((res: Object) => {
                     try {
                         expect(res).to.be.an('array');
@@ -87,7 +268,7 @@ describe('table', () => {
                  done();
      });
      it('If an id passed doesn\'t have an item in the table, an error will be returned', (done: Function) => {
-         db.table('departments', '7')
+         fn.table('departments', '7')
              .then((res: Array<Object>) => {
                  try {
                     expect(res).to.be.undefined;
@@ -103,7 +284,7 @@ describe('table', () => {
                      done(err);
                  }
              });
-        db.table('departments',  ['1', '6', '4'])
+        fn.table('departments',  ['1', '6', '4'])
             .then((res: Array<Object>) => {
                    try {
                     expect(res).to.be.undefined;
@@ -126,11 +307,11 @@ describe('table', () => {
 
 describe('where', () => {
      it('The function should return a reference to the self object', () => {
-         expect(db.where('id')).to.be.an('object');
-         expect(db.where('id')).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then']);
+         expect(fn.where('id')).to.be.an('object');
+         expect(fn.where('id')).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then']);
      });
      it('If the operation is succesful, the resolution should be an Array<Object>', (done: Function) => {
-         db.table('employees')
+         fn.table('employees')
              .where('id', '1')
              .then((res: Array<Object>) => {
                     try {
@@ -151,8 +332,8 @@ describe('where', () => {
          done();
      });
      it('If the operation fail, the resolution should be an error', (done: Function) => {
-         db.table('employees')
-             .where('id', '1', 23)
+         fn.table('employees')
+             .where('id', '1', '23')
              .then((res: Array<Object>) => {
                     try {
                        expect(res).to.be.undefined;
@@ -161,7 +342,7 @@ describe('where', () => {
                         done(err);
                     }
                 }, (err: Error) => {
-                    try{
+                    try {
                         expect(err).to.be.a('string');
                     }
                     catch (err) {
@@ -174,27 +355,27 @@ describe('where', () => {
 
 describe('orderBy', () => {
      it('The function should return a reference to the self object', () => {
-         expect(db.orderBy('id')).to.be.an('object');
-         expect(db.orderBy('id')).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then']);
+         expect(fn.orderBy('id')).to.be.an('object');
+         expect(fn.orderBy('id')).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then']);
      });
      it("If you don't specify an order, the result array is sorted ascendingly", (done: Function) => {
-         db.table('employees')
+         fn.table('employees')
              .orderBy('id')
              .then((res: any) => {
                     try {
                         expect(res).to.be.an('array');
                         expect(res).to.have.lengthOf(4);
                         let i = res.length;
-                        while(--i) {
+                        while (--i) {
                             expect(res[i].id >= res[i - 1].id).to.be.true;
                         }
 
                     }
-                    catch (err){
+                    catch (err) {
                         done(err);
                     }
                 }, (err: Error) => {
-                    try{
+                    try {
                         expect(err).to.be.undefined;
                     }
                     catch (err) {
@@ -204,23 +385,23 @@ describe('orderBy', () => {
          done();
      });
      it("If you specify 'desc' as the order, the result array is sorted descendingly", (done: Function) => {
-         db.table('employees')
+         fn.table('employees')
              .orderBy('id', 'desc')
              .then((res: any) => {
                     try {
                         expect(res).to.be.an('array');
                         expect(res).to.have.lengthOf(4);
                         let i = res.length;
-                        while(--i) {
+                        while (--i) {
                             expect(res[i].id <= res[i - 1].id).to.be.true;
                         }
 
                     }
-                    catch (err){
+                    catch (err) {
                         done(err);
                     }
                 }, (err: Error) => {
-                    try{
+                    try {
                         expect(err).to.be.undefined;
                     }
                     catch (err) {
@@ -230,7 +411,7 @@ describe('orderBy', () => {
          done();
      });
      it("If the especified attribute doesn't exist, the function return the same array", (done: Function) => {
-         db.table('employees')
+         fn.table('employees')
              .orderBy('error')
              .then((res: Array<Object>) => {
                     try {
@@ -241,7 +422,7 @@ describe('orderBy', () => {
                         done(err);
                     }
                 }, (err: Error) => {
-                    try{
+                    try {
                         expect(err).to.be.undefined;
                     }
                     catch (err) {
@@ -255,17 +436,17 @@ describe('orderBy', () => {
 describe('first', () => {
     let first_object: Object;
      before(() => {
-         db.table('employees')
-             .then((res: Array<Object>) => {
+         fn.table('employees')
+             /*.then((res: Array<Object>) => {
                  first_object = res[0];
-             });
+             });*/
      });
      it('The function should return a reference to the self object', () => {
-         expect(db.first()).to.be.an('object');
-         expect(db.first()).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then']);
+         expect(fn.first()).to.be.an('object');
+         expect(fn.first()).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then']);
      });
-     it("If the operation is succesful, the result is the first object of the table", (done: Function) => {
-         db.table('employees')
+     it('If the operation is succesful, the result is the first object of the table', (done: Function) => {
+         fn.table('employees')
              .first()
              .then((res: Array<Object>) => {
                     try {
@@ -277,7 +458,7 @@ describe('first', () => {
                         done(err);
                     }
                 }, (err: Error) => {
-                    try{
+                    try {
                         expect(err).to.be.undefined;
                     }
                     catch (err) {
@@ -287,7 +468,7 @@ describe('first', () => {
          done();
      });
      it("If the operation isn't done over an array, the operation should return an error", (done: Function) => {
-         db.table('employees')
+         fn.table('employees')
              .count()
              .first()
              .then((res: Array<Object>) => {
@@ -311,11 +492,11 @@ describe('first', () => {
 
 describe('count', () => {
      it('The function should return a reference to the self object', () => {
-         expect(db.count()).to.be.an('object');
-         expect(db.count()).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then']);
+         expect(fn.count()).to.be.an('object');
+         expect(fn.count()).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then']);
      });
      it('If the operation is succesful, the result is the number of items of the table', (done: Function) => {
-         db.table('employees')
+         fn.table('employees')
              .count()
              .then((res: number) => {
                     try {
@@ -336,7 +517,7 @@ describe('count', () => {
          done();
      });
      it("If the operation isn't done over an array, the operation should return an error", (done: Function) => {
-         db.table('employees')
+         fn.table('employees')
              .count()
              .count()
              .then((res: Array<Object>) => {
@@ -360,18 +541,18 @@ describe('count', () => {
 
 describe('project', () => {
      it('The function should return a reference to the self object', () => {
-         expect(db.project('hi', 'bye')).to.be.an('object');
-         expect(db.project(['hi', 'bye'])).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then']);
+         expect(fn.project('hi', 'bye')).to.be.an('object');
+         expect(fn.project(['hi', 'bye'])).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then']);
      });
      it('If the operation is succesful, the result is all the objects of the table but only with the specified properties', (done: Function) => {
-         db.table('employees')
+         fn.table('employees')
              .project('id', 'name')
              .then((res: Array<Object>) => {
                     try {
                         expect(res).to.be.an('array');
                         expect(res).to.have.lengthOf(4);
                         let i = res.length;
-                        while(i--) {
+                        while (i--) {
                             expect(res[i]).to.be.an('object');
                             expect(res[i]).to.have.all.keys(['id', 'name']);
                             expect(res[i]).to.not.have.all.keys(['surname', 'department']);
@@ -391,7 +572,7 @@ describe('project', () => {
          done();
      });
      it('If the function is called with no parametters, the operation should return an error', (done: Function) => {
-         db.table('employees')
+         fn.table('employees')
              .project()
              .then((res: Array<Object>) => {
                     try {
@@ -411,7 +592,7 @@ describe('project', () => {
          done();
      });
      it("If the operation isn't done over an array, the operation should return an error", (done: Function) => {
-         db.table('employees')
+         fn.table('employees')
              .count()
              .project('id', 'name')
              .then((res: Array<Object>) => {
@@ -435,17 +616,17 @@ describe('project', () => {
 
 describe('reduce', () => {
      it('The function should return a reference to the self object', () => {
-         expect(db.reduce((result: Array<Object>, o: any) => {
+         expect(fn.reduce((result: Array<Object>, o: any) => {
                 result.push(o);
                 return result;
             }, [])).to.be.an('object');
-         expect(db.reduce((result: Array<Object>, o: any) => {
+         expect(fn.reduce((result: Array<Object>, o: any) => {
                 result.push(o);
                 return result;
             }, [])).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then']);
      });
      it('If the operation is succesful, the result is the table with the item changes specified by the passed function', (done: Function) => {
-         db.table('employees')
+         fn.table('employees')
              .reduce((result: Array<Object>, o: any) => {
                  o.department = 1;
                  result.push(o);
@@ -456,7 +637,7 @@ describe('reduce', () => {
                         expect(res).to.be.an('array');
                         expect(res).to.have.lengthOf(4);
                         let i = res.length;
-                        while(i--) {
+                        while (i--) {
                             expect(res[i]).to.be.an('object');
                             expect(res[i]).to.have.all.keys(['id', 'name', 'surname', 'department']);
                             expect(res[i].department).to.be.equal(1);
@@ -476,7 +657,7 @@ describe('reduce', () => {
          done();
      });
      it("If the operation isn't done over an array, the operation should return an error", (done: Function) => {
-         db.table('employees')
+         fn.table('employees')
              .count()
              .reduce((result: Array<Object>, o: any) => {
                  o.department = 1;
@@ -504,11 +685,11 @@ describe('reduce', () => {
 
 describe('join', () => {
      it('The function should return a reference to the self object', () => {
-         expect(db.table('employees').table('departments').join('department', 'id')).to.be.an('object');
-         expect(db.table('employees').table('departments').join('department', 'id')).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then']);
+         expect(fn.table('employees').table('departments').join('department', 'id')).to.be.an('object');
+         expect(fn.table('employees').table('departments').join('department', 'id')).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then']);
      });
      it('If the operation is succesful, the result is a joined table', (done: Function) => {
-         db.table('employees')
+         fn.table('employees')
              .table('departments')
              .join('department', 'id')
              .then((res: Array<any>) => {
@@ -530,7 +711,7 @@ describe('join', () => {
          done();
      });
      it('If the operation fail, the resolution should be an error', (done: Function) => {
-         db.table('employees')
+         fn.table('employees')
              .join('department', 'id')
              .then((res: Array<Object>) => {
                     try {
@@ -553,11 +734,11 @@ describe('join', () => {
 
 describe('insert', () => {
      it('The function should return a reference to the self object', () => {
-         expect(db.insert('departments', [{id: '7', name: 'Sales'}, {id: '5', name: 'Comercial'}])).to.be.an('object');
-         expect(db.insert('departments', {id: '7', name: 'Sales'})).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then']);
+         expect(fn.insert('departments', [{id: '7', name: 'Sales'}, {id: '5', name: 'Comercial'}])).to.be.an('object');
+         expect(fn.insert('departments', {id: '7', name: 'Sales'})).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then']);
      });
      it('If the operation is succesful, the result is an id or an array of ids', (done: Function) => {
-         db.insert('departments', [{id: '7', name: 'Sales'}, {id: '5', name: 'Comercial'}])
+         fn.insert('departments', [{id: '7', name: 'Sales'}, {id: '5', name: 'Comercial'}])
              .then((res: Array<any>) => {
                     try {
                         expect(res).to.be.an('array');
@@ -574,7 +755,7 @@ describe('insert', () => {
                         done(err);
                     }
              });
-         db.insert('departments', {id: '7', name: 'Sales'})
+         fn.insert('departments', {id: '7', name: 'Sales'})
              .then((res: Array<any>) => {
                     try {
                         expect(res).to.be.a('string').equal('7');
@@ -593,7 +774,7 @@ describe('insert', () => {
          done();
      });
      it('If the operation fail, the resolution should be an error', (done: Function) => {
-         db.insert('employee', {id: '7', name: 'Sales'})
+         fn.insert('employee', {id: '7', name: 'Sales'})
              .then((res: Array<Object>) => {
                     try {
                        expect(res).to.be.undefined;
@@ -615,11 +796,11 @@ describe('insert', () => {
 
 describe('delete', () => {
      it('The function should return a reference to the self object', () => {
-         expect(db.delete('employees', '1')).to.be.an('object');
-         expect(db.delete('employees', '3')).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then']);
+         expect(fn.delete('employees', '1')).to.be.an('object');
+         expect(fn.delete('employees', '3')).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then']);
      });
      it('If the operation is succesful, the result is an id or an array of ids', (done: Function) => {
-         db.delete('departments', ['2', '1'])
+         fn.delete('departments', ['2', '1'])
              .then((res: Array<any>) => {
                     try {
                         expect(res).to.be.an('array');
@@ -636,7 +817,7 @@ describe('delete', () => {
                         done(err);
                     }
              });
-         db.delete('departments', '4')
+         fn.delete('departments', '4')
              .then((res: Array<any>) => {
                     try {
                         expect(res).to.be.a('string').equals('4');
@@ -655,7 +836,7 @@ describe('delete', () => {
          done();
      });
      it('If the operation fail, the resolution should be an error', (done: Function) => {
-         db.delete('employee', '3')
+         fn.delete('employee', '3')
              .then((res: Array<Object>) => {
                     try {
                        expect(res).to.be.undefined;
@@ -671,7 +852,7 @@ describe('delete', () => {
                         done(err);
                     }
              });
-             db.delete('employees', 'hola')
+             fn.delete('employees', 'hola')
              .then((res: Array<Object>) => {
                     try {
                        expect(res).to.be.undefined;
@@ -691,3 +872,69 @@ describe('delete', () => {
      });
 });
 
+after(/*async*/ (done) => {
+    let deletes: Promise<void>[] = [];
+    let inserts: Promise<void>[] = [];
+    let creates: Promise<void>[] = [];
+   console.log('after')
+    deletes.push(dynamodb.deleteTable({TableName: 'employees'}).promise());
+    deletes.push(dynamodb.deleteTable({TableName: 'departments'}).promise());
+    done();
+    /*Promise.all(deletes).then((res) => {
+         let params = {
+            TableName : 'employees',
+            KeySchema: [
+                { AttributeName: 'id', KeyType: 'HASH'}
+            ],
+            AttributeDefinitions: [
+                { AttributeName: 'id', AttributeType: 'S' }
+            ],
+            ProvisionedThroughput: {
+                ReadCapacityUnits: 1,
+                WriteCapacityUnits: 1
+            }
+        };
+        creates.push(dynamodb.createTable(params).promise());
+        params = {
+            TableName : 'departments',
+            KeySchema: [
+                { AttributeName: 'id', KeyType: 'HASH'}
+            ],
+            AttributeDefinitions: [
+                { AttributeName: 'id', AttributeType: 'S' }
+            ],
+            ProvisionedThroughput: {
+                ReadCapacityUnits: 1,
+                WriteCapacityUnits: 1
+            }
+        };
+        creates.push(dynamodb.createTable(params).promise());
+    }, (err) => {
+        done(err);
+    });
+
+    Promise.all(creates).then((res) => {
+        departments.forEach((department) => {
+            let params = {
+                TableName: 'departments',
+                Item: department
+            };
+            inserts.push(docClient.put(params).promise());
+        });
+        employees.forEach((employee) => {
+            let params = {
+                TableName: 'employees',
+                Item: employee
+            };
+            inserts.push(docClient.put(params).promise());
+        });
+    }, (err: Error) => {
+        done(err);
+    });
+
+    Promise.all(inserts).then((res) => {
+        done();
+    }, (err) => {
+        done(err);
+    });*/
+});

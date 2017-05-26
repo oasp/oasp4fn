@@ -187,12 +187,23 @@ ${yml.imports}
 import { ${obj.name} } from '${import_path}';`;
     yml.routes = `
     ${yml.routes}
-app.${obj.oasp4fn.events.method}('/${route}', (req: any, res) => {
-    ${obj.name}(req, {}, (err: Error, result: object) => {
+app.${obj.oasp4fn.events.method}('/${route}', (req, res) => {
+    let event = {
+        method: req.method,
+        headers: _.mapKeys(req.headers, (value, key) => {
+            if (key === 'authorization')
+                return _.upperFirst(key);
+            return key;
+        }),
+        query: req.query,
+        path: req.params,
+        body: req.body
+    };
+    ${obj.name}(event, {}, (err: Error, result: object) => {
         if (err)
-            res.json(err);
+            res.send(err);
         else
-            res.json(result);
+            res.send(result);
     });
 });
 `;
