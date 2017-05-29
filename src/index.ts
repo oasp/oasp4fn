@@ -124,7 +124,7 @@ export default {
             });
         return this;
     },
-    filter: function (iteratee: _.ObjectIterator<object, any>) {
+    filter: function (iteratee: object) {
         if (solution[0])
             solution[0] = solution[0].then((res: object[]): any => {
                 if (Array.isArray(res))
@@ -133,7 +133,7 @@ export default {
             });
         return this;
     },
-    reduce: function (iteratee: _.ObjectIterator<object, any>, accumulator?: any[] | object | number) {
+    reduce: function (iteratee: _.MemoIterator<object, object>, accumulator?: any[] | object | number) {
         let _accumulator = accumulator ? accumulator : [];
         if (solution[0])
             solution[0] = solution[0].then((res: _.Dictionary<string>) => {
@@ -221,7 +221,7 @@ export default {
 
         return this;
     },
-    then: function (result: Function | null, reject: Function | null) {
+    then: function (result?: Function, reject?: Function) {
         let promise: Promise<object[] | object | string | number> = solution[0];
         if (result && reject) {
             promise = solution[0]

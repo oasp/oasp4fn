@@ -23,7 +23,7 @@ export default {
                                 accumulator.push(o.Key);
                                 return accumulator;
                             }, []);
-                while(next){
+                while (next) {
                     s3.listObjectsV2({ Bucket: bucket, ContinuationToken: next }).promise()
                         .then((res: AWS.S3.ListObjectsV2Output) => {
                             next = res.NextContinuationToken as string;
@@ -89,7 +89,7 @@ export default {
          });
          return s3.deleteObjects(<AWS.S3.DeleteObjectsRequest>params).promise()
             .then((res: AWS.S3.DeleteObjectsOutput) => {
-                if(typeof res.Deleted === 'undefined')
+                if (typeof res.Deleted === 'undefined')
                     throw new Error('No objects have been deleted');
                 let result = _.reduceRight(res.Deleted, (accumulator: string[],  o: AWS.S3.DeletedObject) => {
                     accumulator.push(<string>o.Key);

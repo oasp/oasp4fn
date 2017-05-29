@@ -1,4 +1,4 @@
-import { Environment } from 'aws-sdk/clients/lambda';
+import { MemoIterator, ObjectIterator } from 'lodash'
 
 interface Oasp4Fn {
     /**
@@ -96,31 +96,31 @@ interface Oasp4Fn {
     /**
      * Function that iterates over the elements of an Array applying the changes specified by iteratee
      * 
-     * @param {Function} iteratee 
+     * @param {ObjectIterator<object, any>} iteratee 
      * @returns {Oasp4Fn} 
      * 
      * @memberOf Oasp4Fn
      */
-    map(iteratee: Function): Oasp4Fn
+    map(iteratee: ObjectIterator<object, any>): Oasp4Fn
     /**
      * Function that filters the elements of an Array, returning a new Array with the elements in which iteratee returns true
      * 
-     * @param {Function} iteratee 
+     * @param {object} iteratee 
      * @returns {Oasp4Fn} 
      * 
      * @memberOf Oasp4Fn
      */
-    filter(iteratee: Function): Oasp4Fn
+    filter(iteratee: object): Oasp4Fn
     /**
      * Function that iterates over the elements of a table applying the changes specified by iteratee, and accumulating the result in the accumulator. This operation is useful to calculate operations like SUM or MAX
      * 
-     * @param {Function} iteratee 
+     * @param {MemoIterator<object, object>} iteratee 
      * @param {(any[] | object | number)} [accumulator] 
      * @returns {Oasp4Fn} 
      * 
      * @memberOf Oasp4Fn
      */
-    reduce(iteratee: Function, accumulator?: any[] | object | number ): Oasp4Fn
+    reduce(iteratee: MemoIterator<object, object>, accumulator?: any[] | object | number ): Oasp4Fn
     /**
      * Function to insert new items in a table
      * 
@@ -214,7 +214,7 @@ interface Oasp4Fn {
      * 
      * @memberOf Oasp4Fn
      */
-    then(result: Function | null, reject: Function | null): Promise<object[] | object | string | number>
+    then(result?: Function, reject?: Function): Promise<object[] | object | string | number>
     /**
      * This function return the solution as a promise
      * 
