@@ -1,4 +1,4 @@
-import * as AWS from 'aws-sdk';
+
 import { expect } from 'chai';
 import fn from '../src/index';
 import dynamo from '../src/adapters/fn-dynamo';
@@ -120,6 +120,7 @@ describe('table', () => {
             try {
                 expect(res).to.be.an('array');
                 expect(res).to.have.lengthOf(4);
+                done();
             }
             catch (err) {
                 done(err);
@@ -127,17 +128,18 @@ describe('table', () => {
          }, (err: Error) => {
              try {
                 expect(err).to.be.undefined;
+                done();
              }
              catch (err) {
                 done(err);
              }
          });
-         done();
      });
      it('If the table doesn\'t exist, the resolution promise should return an Error', (done: Function) => {
          fn.table('some_table').then((res: object[]) => {
             try {
                 expect(res).to.be.undefined;
+                done();
              }
              catch (err) {
                  done(err);
@@ -145,12 +147,12 @@ describe('table', () => {
             }, (err: Error) => {
              try {
                 expect(err).to.not.be.null;
+                done();
              }
              catch (err) {
                  done(err);
              }
          });
-         done();
      });
      it('If an id is passed along with the name of the table, the corresponding item will be returned', (done: Function) => {
          fn.table('departments', '1')
@@ -158,6 +160,7 @@ describe('table', () => {
                  try {
                  expect(res).to.be.an('object');
                  expect(res).to.have.property('id', '1');
+                 done();
                 }
                 catch (err) {
                     done(err);
@@ -165,12 +168,12 @@ describe('table', () => {
              }, (err: Error) => {
                  try {
                      expect(err).to.be.undefined;
+                     done();
                  }
                  catch (err) {
                      done(err);
                  }
              });
-             done();
      });
      it('If an array of id\'s is passed along with the name of the table, the corresponding list of items will be returned', (done: Function) => {
              fn.table('departments', ['1', '3', '4'])
@@ -178,6 +181,7 @@ describe('table', () => {
                     try {
                         expect(res).to.be.an('array');
                         expect(res).to.have.lengthOf(3);
+                        done();
                     }
                     catch (err) {
                         done(err);
@@ -185,18 +189,19 @@ describe('table', () => {
                  }, (err: Error) => {
                      try {
                          expect(err).to.be.undefined;
+                         done();
                      }
                      catch (err) {
                          done(err);
                      }
                  });
-                 done();
      });
      it('If an id passed doesn\'t have an item in the table, an error will be returned', (done: Function) => {
          fn.table('departments', '7')
              .then((res: Department) => {
                  try {
                     expect(res).to.be.undefined;
+                    done();
                    }
                  catch (err) {
                         done(err);
@@ -204,12 +209,12 @@ describe('table', () => {
              }, (err: Error) => {
                  try {
                      expect(err).to.be.a('string');
+                     done();
                  }
                  catch (err) {
                      done(err);
                  }
              });
-            done();
      });
 });
 
@@ -225,6 +230,7 @@ describe('where', () => {
                     try {
                         expect(res).to.be.an('array');
                         expect(res).to.have.lengthOf(1);
+                        done();
                     }
                     catch (err) {
                         done(err);
@@ -232,12 +238,12 @@ describe('where', () => {
                 }, (err: Error) => {
                     try {
                         expect(err).to.be.undefined;
+                        done();
                     }
                     catch (err) {
                         done(err);
                     }
              });
-         done();
      });
      it('If the operation fail, the resolution should be an error', (done: Function) => {
          fn.table('employees')
@@ -245,6 +251,7 @@ describe('where', () => {
              .then((res: Employee[]) => {
                     try {
                        expect(res).to.be.undefined;
+                       done();
                     }
                     catch (err) {
                         done(err);
@@ -252,12 +259,12 @@ describe('where', () => {
                 }, (err: Error) => {
                     try {
                         expect(err).to.be.a('string');
+                        done();
                     }
                     catch (err) {
                         done(err);
                     }
              });
-         done();
      });
 });
 
@@ -277,6 +284,7 @@ describe('orderBy', () => {
                         while (--i) {
                             expect(res[i].id >= res[i - 1].id).to.be.true;
                         }
+                        done();
 
                     }
                     catch (err) {
@@ -285,12 +293,12 @@ describe('orderBy', () => {
                 }, (err: Error) => {
                     try {
                         expect(err).to.be.undefined;
+                        done();
                     }
                     catch (err) {
                         done(err);
                     }
              });
-         done();
      });
      it("If you specify 'desc' as the order, the result array is sorted descendingly", (done: Function) => {
          fn.table('employees')
@@ -303,6 +311,7 @@ describe('orderBy', () => {
                         while (--i) {
                             expect(res[i].id <= res[i - 1].id).to.be.true;
                         }
+                        done();
                     }
                     catch (err) {
                         done(err);
@@ -310,12 +319,12 @@ describe('orderBy', () => {
                 }, (err: Error) => {
                     try {
                         expect(err).to.be.undefined;
+                        done();
                     }
                     catch (err) {
                         done(err);
                     }
              });
-         done();
      });
      it("If the especified attribute doesn't exist, the function return the same array", (done: Function) => {
          fn.table('employees')
@@ -324,6 +333,7 @@ describe('orderBy', () => {
                     try {
                        expect(res).to.be.an('array');
                        expect(res).to.have.lengthOf(4);
+                       done();
                     }
                     catch (err) {
                         done(err);
@@ -331,12 +341,12 @@ describe('orderBy', () => {
                 }, (err: Error) => {
                     try {
                         expect(err).to.be.undefined;
+                        done();
                     }
                     catch (err) {
                         done(err);
                     }
              });
-         done();
      });
 });
 
@@ -360,6 +370,7 @@ describe('first', () => {
                         expect(res).to.be.an('array');
                         expect(res).to.have.lengthOf(1);
                         expect(res[0]).to.deep.equal(first_object);
+                        done();
                     }
                     catch (err) {
                         done(err);
@@ -367,12 +378,12 @@ describe('first', () => {
                 }, (err: Error) => {
                     try {
                         expect(err).to.be.undefined;
+                        done();
                     }
                     catch (err) {
                         done(err);
                     }
              });
-         done();
      });
      it("If the operation isn't done over an array, the operation should return an error", (done: Function) => {
          fn.table('employees')
@@ -381,6 +392,7 @@ describe('first', () => {
              .then((res: Employee[]) => {
                     try {
                        expect(res).to.be.undefined;
+                       done();
                     }
                     catch (err) {
                         done(err);
@@ -388,12 +400,12 @@ describe('first', () => {
                 }, (err: Error) => {
                     try {
                         expect(err).to.be.a('string');
+                        done();
                     }
                     catch (err) {
                         done(err);
                     }
              });
-         done();
      });
 });
 
@@ -409,6 +421,7 @@ describe('count', () => {
                     try {
                         expect(res).to.be.an('number');
                         expect(res).to.be.equals(4);
+                        done();
                     }
                     catch (err) {
                         done(err);
@@ -416,12 +429,12 @@ describe('count', () => {
                 }, (err: Error) => {
                     try {
                         expect(err).to.be.undefined;
+                        done();
                     }
                     catch (err) {
                         done(err);
                     }
              });
-         done();
      });
      it("If the operation isn't done over an array, the operation should return an error", (done: Function) => {
          fn.table('employees')
@@ -430,6 +443,7 @@ describe('count', () => {
              .then((res: number) => {
                     try {
                        expect(res).to.be.undefined;
+                       done();
                     }
                     catch (err) {
                         done(err);
@@ -437,12 +451,12 @@ describe('count', () => {
                 }, (err: Error) => {
                     try {
                         expect(err).to.be.a('string');
+                        done();
                     }
                     catch (err) {
                         done(err);
                     }
              });
-         done();
      });
 });
 
@@ -464,6 +478,7 @@ describe('project', () => {
                             expect(res[i]).to.have.all.keys(['id', 'firstname']);
                             expect(res[i]).to.not.have.all.keys(['surname', 'department']);
                         }
+                        done();
                     }
                     catch (err) {
                         done(err);
@@ -471,12 +486,12 @@ describe('project', () => {
                 }, (err: Error) => {
                     try {
                         expect(err).to.be.undefined;
+                        done();
                     }
                     catch (err) {
                         done(err);
                     }
              });
-         done();
      });
      it('If the function is called with no parametters, the operation should return an error', (done: Function) => {
          fn.table('employees')
@@ -484,6 +499,7 @@ describe('project', () => {
              .then((res: undefined) => {
                     try {
                        expect(res).to.be.undefined;
+                       done();
                     }
                     catch (err) {
                         done(err);
@@ -491,12 +507,12 @@ describe('project', () => {
                 }, (err: Error) => {
                     try {
                         expect(err).to.be.a('string');
+                        done();
                     }
                     catch (err) {
                         done(err);
                     }
              });
-         done();
      });
      it("If the operation isn't done over an array, the operation should return an error", (done: Function) => {
          fn.table('employees')
@@ -505,6 +521,7 @@ describe('project', () => {
              .then((res: {id: string, firstname: string}[]) => {
                     try {
                        expect(res).to.be.undefined;
+                       done();
                     }
                     catch (err) {
                         done(err);
@@ -512,12 +529,12 @@ describe('project', () => {
                 }, (err: Error) => {
                     try {
                         expect(err).to.be.a('string');
+                        done();
                     }
                     catch (err) {
                         done(err);
                     }
              });
-         done();
      });
 });
 
@@ -549,6 +566,7 @@ describe('reduce', () => {
                             expect(res[i]).to.have.all.keys(['id', 'firstname', 'surname', 'department']);
                             expect(res[i].department).to.be.equal('1');
                         }
+                        done();
                     }
                     catch (err) {
                         done(err);
@@ -556,12 +574,12 @@ describe('reduce', () => {
                 }, (err: Error) => {
                     try {
                         expect(err).to.be.undefined;
+                        done();
                     }
                     catch (err) {
                         done(err);
                     }
              });
-         done();
      });
      it("If the operation isn't done over an array, the operation should return an error", (done: Function) => {
          fn.table('employees')
@@ -574,6 +592,7 @@ describe('reduce', () => {
              .then((res: Array<Object>) => {
                     try {
                        expect(res).to.be.undefined;
+                       done();
                     }
                     catch (err) {
                         done(err);
@@ -581,12 +600,12 @@ describe('reduce', () => {
                 }, (err: Error) => {
                     try {
                         expect(err).to.be.a('string');
+                        done();
                     }
                     catch (err) {
                         done(err);
                     }
              });
-         done();
      });
 });
 
@@ -604,6 +623,7 @@ describe('join', () => {
                     try {
                         expect(res).to.be.an('array');
                         expect(res).to.have.lengthOf(4);
+                        done();
                     }
                     catch (err) {
                         done(err);
@@ -611,12 +631,12 @@ describe('join', () => {
                 }, (err: Error) => {
                     try {
                         expect(err).to.be.undefined;
+                        done();
                     }
                     catch (err) {
                         done(err);
                     }
              });
-         done();
      });
      it('If the operation fail, the resolution should be an error', (done: Function) => {
          fn.table('employees')
@@ -624,19 +644,20 @@ describe('join', () => {
              .then((res: object[]) => {
                     try {
                        expect(res).to.be.undefined;
+                       done();
                     }
                     catch (err) {
                         done(err);
                     }
                 }, (err: Error) => {
                     try {
-                        expect(err).to.be.a('string');
+                        expect(err).to.not.be.null;
+                        done();
                     }
                     catch (err) {
                         done(err);
                     }
              });
-         done();
      });
 });
 
@@ -667,6 +688,7 @@ describe('insert', () => {
              .then((res: string) => {
                     try {
                         expect(res).to.be.a('string').equal('8');
+                        done();
                     }
                     catch (err) {
                         done(err);
@@ -674,18 +696,19 @@ describe('insert', () => {
                 }, (err: Error) => {
                     try {
                         expect(err).to.be.undefined;
+                        done();
                     }
                     catch (err) {
                         done(err);
                     }
              });
-         done();
      });
      it('If the operation fail, the resolution should be an error', (done: Function) => {
          fn.insert('employee', {id: '7', name: 'Sales'})
              .then((res: string) => {
                     try {
                        expect(res).to.be.undefined;
+                       done();
                     }
                     catch (err) {
                         done(err);
@@ -693,12 +716,12 @@ describe('insert', () => {
                 }, (err: Error) => {
                     try {
                         expect(err).to.not.be.null;
+                        done();
                     }
                     catch (err) {
                         done(err);
                     }
              });
-         done();
      });
 });
 
@@ -729,6 +752,7 @@ describe('delete', () => {
              .then((res: string) => {
                     try {
                         expect(res).to.be.a('string').equals('8');
+                        done();
                     }
                     catch (err) {
                         done(err);
@@ -736,12 +760,12 @@ describe('delete', () => {
                 }, (err: Error) => {
                     try {
                         expect(err).to.be.undefined;
+                        done();
                     }
                     catch (err) {
                         done(err);
                     }
              });
-         done();
      });
      it('If the operation fail, the resolution should be an error', (done: Function) => {
          fn.delete('employee', '3')
@@ -754,7 +778,7 @@ describe('delete', () => {
                     }
                 }, (err: Error) => {
                     try {
-                        expect(err).to.be.a('string');
+                        expect(err).to.not.be.null;
                     }
                     catch (err) {
                         done(err);
@@ -764,18 +788,19 @@ describe('delete', () => {
              .then((res: string) => {
                     try {
                        expect(res).to.be.undefined;
+                       done();
                     }
                     catch (err) {
                         done(err);
                     }
                 }, (err: Error) => {
                     try {
-                        expect(err).to.be.a('string');
+                        expect(err).to.not.be.null;
+                        done();
                     }
                     catch (err) {
                         done(err);
                     }
              });
-         done();
      });
 });

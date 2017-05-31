@@ -40,53 +40,47 @@ before(async function () {
 describe('upload', () => {
 
      it('The function should return a reference to the self object', () => {
-         expect(fn.upload('oasp4fn', 'id', new Buffer('someBuffer'))).to.be.an('object');
+         expect(fn.upload('oasp4fn', 'test.txt', new Buffer('someBuffer'))).to.be.an('object');
      });
      it('If the upload is succesfull, the resolution should be the location of the object', (done: Function) => {
-         console.log('upload 1');
         fn.upload('oasp4fn', 'test.txt', new Buffer('test'))
             .then((res: string) => {
             try {
-                console.log('upload resolved');
-                console.log(res);
                 expect(res).to.be.a('string');
+                done();
             }
             catch (err) {
                 done(err);
             }
          }, (err: Error) => {
              try {
-                console.log('upload rejected');
-                console.log(err);
                 expect(err).to.be.undefined;
+                done();
              }
              catch (err) {
                 done(err);
              }
          });
-         console.log('upload 1');
-         done();
      });
      it('If the bucket doesn\'t exist, the resolution promise should return an Error', (done: Function) => {
-         fn.upload('some_bucket', 'test.txt', new Buffer('test')).then((res: object[]) => {
+         fn.upload('some_bucket', 'test.txt', new Buffer('test'))
+             .then((res: string) => {
             try {
-                console.log('upload resolved');
-                console.log(res);
                 expect(res).to.be.undefined;
+                done();
              }
              catch (err) {
                  done(err);
              }
             }, (err: Error) => {
              try {
-                console.log(err);
                 expect(err).to.not.be.null;
+                done();
              }
              catch (err) {
                  done(err);
              }
          });
-         done();
      });
 });
 
@@ -99,8 +93,86 @@ describe('bucket', () => {
         fn.bucket('oasp4fn')
             .then((res: string[]) => {
             try {
-                console.log(res);
+                expect(res).to.be.a('array');
+                expect(res).to.include('test.txt');
+                done();
+            }
+            catch (err) {
+                done(err);
+            }
+         }, (err: Error) => {
+             try {
+                expect(err).to.be.undefined;
+                done();
+             }
+             catch (err) {
+                done(err);
+             }
+         });
+     });
+     it('If an object key is especified, the function should return the especified object, as binary data', (done: Function) => {
+        fn.bucket('oasp4fn', 'test.txt')
+            .then((res: Buffer) => {
+            try {
+                expect(Buffer.isBuffer(res)).to.be.true;
+                done();
+            }
+            catch (err) {
+                done(err);
+            }
+         }, (err: Error) => {
+             try {
+                expect(err).to.be.undefined;
+                done();
+             }
+             catch (err) {
+                done(err);
+             }
+         });
+     });
+     it('If the bucket doesn\'t exist, the resolution promise should return an Error', (done: Function) => {
+         fn.bucket('some_bucket').then((res: string[]) => {
+            try {
+                expect(res).to.be.undefined;
+                done();
+             }
+             catch (err) {
+                 done(err);
+             }
+            }, (err: Error) => {
+             try {
+                expect(err).to.not.be.null;
+                done();
+             }
+             catch (err) {
+                 done(err);
+             }
+         });
+     });
+});
+
+describe('deleteObject', () => {
+     before((done: Function) => {
+        let promises: Promise<object>[] = [];
+        promises.push(<Promise<object>>fn.upload('oasp4fn', 'test1.txt', new Buffer('test')).promise());
+        promises.push(<Promise<object>>fn.upload('oasp4fn', 'test2.txt', new Buffer('test')).promise());
+        promises.push(<Promise<object>>fn.upload('oasp4fn', 'test3.txt', new Buffer('test')).promise());
+        Promise.all(promises)
+            .then((res: any) => {
+                done();
+            }, (err: Error) => {
+                done(err);
+            });
+     });
+     it('The function should return a reference to the self object', () => {
+         expect(fn.deleteObject('oasp4fn', 'test1.txt')).to.be.an('object');
+     });
+     it('If the operation is succesfull, the resolution should be the key or keys of deleted object/s', (done: Function) => {
+        fn.deleteObject('oasp4fn', 'test.txt')
+            .then((res: string) => {
+            try {
                 expect(res).to.be.a('string');
+                expect(res).to.be.equal('test.txt');
             }
             catch (err) {
                 done(err);
@@ -113,12 +185,32 @@ describe('bucket', () => {
                 done(err);
              }
          });
-         done();
+         fn.deleteObject('oasp4fn', ['test2.txt', 'test3.txt'])
+            .then((res: string[]) => {
+            try {
+                expect(res).to.be.an('array');
+                expect(res).to.include.members(['test2.txt', 'test3.txt']);
+                done();
+            }
+            catch (err) {
+                done(err);
+            }
+         }, (err: Error) => {
+             try {
+                expect(err).to.be.undefined;
+                done();
+             }
+             catch (err) {
+                done(err);
+             }
+         });
      });
      it('If the bucket doesn\'t exist, the resolution promise should return an Error', (done: Function) => {
-         fn.bucket('some_bucket').then((res: string[]) => {
+         fn.deleteObject('some_bucket', 'test')
+             .then((res: string) => {
             try {
                 expect(res).to.be.undefined;
+                done();
              }
              catch (err) {
                  done(err);
@@ -126,11 +218,11 @@ describe('bucket', () => {
             }, (err: Error) => {
              try {
                 expect(err).to.not.be.null;
+                done();
              }
              catch (err) {
                  done(err);
              }
          });
-         done();
      });
 });

@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-let DynamoDB = require('aws-sdk/clients/dynamodb');
+import * as AWS from 'aws-sdk';
 
 let dynamodb: AWS.DynamoDB;
 let docClient: AWS.DynamoDB.DocumentClient;
@@ -9,8 +9,8 @@ let tables: any = {};
 
 export default {
   instance: function (options: object = {}) {
-      dynamodb = new DynamoDB(_.assign(DEFAULT_OPTS, options));
-      docClient = new DynamoDB.DocumentClient(_.assign(DEFAULT_OPTS, options));
+      dynamodb = new AWS.DynamoDB(_.assign(DEFAULT_OPTS, options));
+      docClient = new AWS.DynamoDB.DocumentClient(_.assign(DEFAULT_OPTS, options));
   },
   getItem: function (table_name: string, id: string) {
     let params = {
@@ -185,7 +185,7 @@ export default {
               .then((res: AWS.DynamoDB.DeleteItemOutput): any => {
                 if (res.Attributes === undefined)
                   return Promise.reject('The item with id: ' + id + ' doesn\'t exist');
-                return res.Attributes;
+                return id;
               }, (err: Error) => {
                 return Promise.reject(err);
               });
