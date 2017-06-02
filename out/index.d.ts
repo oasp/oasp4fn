@@ -66,7 +66,7 @@ interface Oasp4Fn {
      * 
      * @memberOf Oasp4Fn
      */
-    orderBy(attribute: string, order?: string): Oasp4Fn
+    orderBy(attribute: _.Many<string | _.ListIterator<object, any>>, order?: string | string[]): Oasp4Fn
     /**
      * Function that returns the first object of a table, or the number of elements specified by quantity if it’s defined
      * 

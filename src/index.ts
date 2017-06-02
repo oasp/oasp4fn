@@ -4,7 +4,8 @@ let db: FnDBService;
 let storage: FnStorageService;
 let auth: FnAuthService;
 
-let solution: Array<Promise<object[] | object | string | number | never>> = [];
+let solution: Array<Promise<object[] | object | string | string[] | number | never>> = [];
+let tableName: string;
 
 export default {
     config: function (configuration: ServerlessConfiguration) {},
@@ -33,6 +34,8 @@ export default {
             default:
                 solution.push(db.getItems(name));
         }
+        
+        tableName = name;
 
         return this;
     },
@@ -70,8 +73,13 @@ export default {
 
         return this;
     },
-    orderBy: function (attribute: string, order?: string) {
-        let _order = (order === 'asc' || order === 'desc') ? order : 'asc';
+    orderBy: function (attribute: _.Many<string | _.ListIterator<object, any>>, order?: string | string[]) {
+        let _order: string | string[];
+        if (typeof attribute === 'string') {
+            _order = (order === 'asc' || order === 'desc') ? order : 'asc';
+        } else {
+            _order = (order !== undefined && order.length === attribute.length) ? order : _.fill(Array(attribute.length), 'asc');
+        }
 
         if (solution[0])
             solution[0] = solution[0].then((res: Array<object>): any => {
@@ -139,23 +147,62 @@ export default {
             solution[0] = solution[0].then((res: _.Dictionary<string>) => {
                 if (Array.isArray(res))
                     return _.reduceRight(res, iteratee, _accumulator);
-                return Promise.reject('Invalid use of each operation');
+                return Promise.reject('Invalid use of reduce operation');
             });
         return this;
     },
-    insert: function (table_name: string, items: Object | object[]) {
-        if (Array.isArray(items))
-            solution[0] = db.putItems(table_name, items);
+    insert: function (table_name?: string, items?: Object | object[]) {
+        if (table_name) {
+            if (items) {
+                if (Array.isArray(items))
+                    solution[0] = db.putItems(table_name, items);
+                else
+                    solution[0] = db.putItem(table_name, items);
+            }
+            else
+                solution[0] = Promise.reject('Invalid use of insert operation');
+        }
+        else if (tableName) {
+            solution[0] = solution[0].then((res) => {
+                if(Array.isArray(res)) 
+                    return <any>db.putItems(tableName, res);
+                else
+                    return db.putItem(tableName, res);
+            })
+        }
         else
-            solution[0] = db.putItem(table_name, items);
+            solution[0] = Promise.reject('Invalid use of insert operation');
 
         return this;
     },
-    delete: function (table_name: string, ids: string | string[]) {
-         if (Array.isArray(ids))
-            solution[0] = db.deleteItems(table_name, ids);
-        else
-            solution[0] = db.deleteItem(table_name, ids);
+    delete: function (table_name?: string, ids?: string | string[]) {
+        if (table_name) {
+            if(ids) {
+                if (Array.isArray(ids))
+                    solution[0] = db.deleteItems(table_name, ids);
+                else
+                    solution[0] = db.deleteItem(table_name, ids);
+            }
+            else 
+                solution[0] = Promise.reject('Invalid use of delete operation');
+        }
+        else if (tableName) {
+            solution[0] = solution[0].then((res: any) => {
+                if(Array.isArray(res)) {
+                     return <any>db.deleteItems(tableName, _.reduceRight(res, (accum: string[], item, key) => {
+                        if(typeof item === 'string')
+                            accum.push(item);
+                        else if(_.size(item) === 1)
+                            accum.push(<string>_.get(item, key));
+                        return accum
+                    }, []));
+                }
+                else
+                    return db.deleteItem(tableName, res);
+            })
+        }
+        else 
+            solution[0] = Promise.reject('Invalid use of delete operation');
 
         return this;
     },
@@ -243,10 +290,12 @@ export default {
                     return reject(err);
                 });
         }
+        tableName = '';
         solution = [];
         return promise;
     },
     promise: function () {
+        tableName = '';
         return solution.shift();
     }
 };

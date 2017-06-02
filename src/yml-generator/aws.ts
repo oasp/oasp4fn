@@ -196,14 +196,14 @@ app.${obj.oasp4fn.events.method}('/${route}', (req, res) => {
             return key;
         }),
         query: req.query,
-        path: req.params,
+        path: <any>_.reduceRight(req.params, (accum: object, param: string, key: string) => _.set(accum, key, _.trim(param,'"')), {}),
         body: req.body
     };
     ${obj.name}(event, {}, (err: Error, result: object) => {
         if (err)
-            res.send(err);
+            res.status(500).json(err);
         else
-            res.send(result);
+            res.json(result);
     });
 });
 `;
