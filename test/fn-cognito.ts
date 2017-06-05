@@ -1,6 +1,6 @@
 
 import { expect } from 'chai';
-import fn from '../src/index';
+import Oasp4Fn from '../src/index';
 import cognito from '../src/adapters/fn-cognito';
 import * as AWS from 'aws-sdk';
 
@@ -8,6 +8,7 @@ let region = process.env.REGION || 'us-west-2';
 let pool: { clientId: string, userPoolId: string};
 let aws_cognito = new AWS.CognitoIdentityServiceProvider({ region: region });
 
+let fn = new Oasp4Fn();
 fn.setAuth(cognito);
 
 before(async function () {

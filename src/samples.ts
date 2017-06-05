@@ -1,10 +1,11 @@
-import fn from './index';
+import Oasp4Fn from './index';
 import dynamo from './adapters/fn-dynamo';
 import s3 from './adapters/fn-s3';
 import * as fs from 'fs';
 
-// Dynamo
+let fn = new Oasp4Fn();
 
+// Dynamo
 fn.setDB(dynamo);
 
 fn.table('employees')

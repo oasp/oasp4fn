@@ -12,11 +12,11 @@
     "Santos Jimenez <santos.jimenez-linares@capgemini.com>",
     "Ruben Diaz <ruben.diaz-martinez@capgemini.com>"
   ],
-  "main": "out/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
     "dev": "tsc -w",
-    "sample": "node out/samples.js",
+    "sample": "node dist/samples.js",
     "test": "mocha --opts mocha.opts",
     "test:auto": "mocha --opts mocha.opts --watch",
     "prepublish": "npm run build"
@@ -55,5 +55,5 @@
     "oasp4fn": "./bin/oasp4fn",
     "fun": "./bin/oasp4fn"
   },
-  "types": "out/index.d.ts"
+  "types": "dist/index.d.ts"
 }

@@ -1,11 +1,12 @@
 
 import { expect } from 'chai';
-import fn from '../src/index';
+import Oasp4Fn from '../src/index';
 import s3 from '../src/adapters/fn-s3';
 import * as AWS from 'aws-sdk';
 
 let aws_s3 = new AWS.S3();
 
+let fn = new Oasp4Fn();
 fn.setStorage(s3);
 
 before(async function () {

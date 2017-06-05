@@ -1,6 +1,6 @@
 
 import { expect } from 'chai';
-import fn from '../src/index';
+import Oasp4Fn from '../src/index';
 import dynamo from '../src/adapters/fn-dynamo';
 let DynamoDB = require('aws-sdk/clients/dynamodb');
 
@@ -9,6 +9,7 @@ let region = process.env.REGION || 'us-west-2';
 let dynamodb = new DynamoDB({ endpoint: endpoint, region: region });
 let docClient = new DynamoDB.DocumentClient({ endpoint: endpoint, region: region });
 
+let fn = new Oasp4Fn();
 fn.setDB(dynamo, { endpoint: endpoint, region: region });
 
 interface Employee {
@@ -113,7 +114,6 @@ describe('table', () => {
 
      it('The function should return a reference to the self object', () => {
          expect(fn.table('employees')).to.be.an('object');
-         expect(fn.table('employees')).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then']);
      });
      it('If the table exist, the resolution promise should return an Array<Object>', (done: Function) => {
         fn.table('employees').then((res: Employee[]) => {
@@ -221,7 +221,6 @@ describe('table', () => {
 describe('where', () => {
      it('The function should return a reference to the self object', () => {
          expect(fn.where('id')).to.be.an('object');
-         expect(fn.where('id')).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then']);
      });
      it('If the operation is succesful, the resolution should be an Array<Object>', (done: Function) => {
          fn.table('employees')
@@ -271,7 +270,6 @@ describe('where', () => {
 describe('orderBy', () => {
      it('The function should return a reference to the self object', () => {
          expect(fn.orderBy('id')).to.be.an('object');
-         expect(fn.orderBy('id')).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then']);
      });
      it("If you don't specify an order, the result array is sorted ascendingly", (done: Function) => {
          fn.table('employees')
@@ -360,7 +358,6 @@ describe('first', () => {
      });
      it('The function should return a reference to the self object', () => {
          expect(fn.first()).to.be.an('object');
-         expect(fn.first()).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then']);
      });
      it('If the operation is succesful, the result is the first object of the table', (done: Function) => {
          fn.table('employees')
@@ -412,7 +409,6 @@ describe('first', () => {
 describe('count', () => {
      it('The function should return a reference to the self object', () => {
          expect(fn.count()).to.be.an('object');
-         expect(fn.count()).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then']);
      });
      it('If the operation is succesful, the result is the number of items of the table', (done: Function) => {
          fn.table('employees')
@@ -463,7 +459,6 @@ describe('count', () => {
 describe('project', () => {
      it('The function should return a reference to the self object', () => {
          expect(fn.project('hi', 'bye')).to.be.an('object');
-         expect(fn.project(['hi', 'bye'])).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then']);
      });
      it('If the operation is succesful, the result is all the objects of the table but only with the specified properties', (done: Function) => {
          fn.table('employees')
@@ -544,10 +539,6 @@ describe('reduce', () => {
                 result.push(o);
                 return result;
             }, [])).to.be.an('object');
-         expect(fn.reduce((result: object[], o: any) => {
-                result.push(o);
-                return result;
-            }, [])).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then']);
      });
      it('If the operation is succesful, the result is the table with the item changes specified by the passed function', (done: Function) => {
          fn.table('employees')
@@ -612,7 +603,6 @@ describe('reduce', () => {
 describe('join', () => {
      it('The function should return a reference to the self object', () => {
          expect(fn.table('employees').table('departments').join('department', 'id')).to.be.an('object');
-         expect(fn.table('employees').table('departments').join('department', 'id')).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then']);
          fn.then();
      });
      it('If the operation is succesful, the result is a joined table', (done: Function) => {
@@ -664,7 +654,6 @@ describe('join', () => {
 describe('insert', () => {
      it('The function should return a reference to the self object', () => {
          expect(fn.insert('departments', [{id: '7', name: 'Sales'}, {id: '5', name: 'Comercial'}])).to.be.an('object');
-         expect(fn.insert('departments', {id: '7', name: 'Sales'})).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then']);
      });
      it('If the operation is succesful, the result is an id or an array of ids', (done: Function) => {
          fn.insert('departments', [{id: '7', name: 'Sales'}, {id: '5', name: 'Comercial'}])
@@ -728,7 +717,6 @@ describe('insert', () => {
 describe('delete', () => {
      it('The function should return a reference to the self object', () => {
          expect(fn.delete('employees', '1')).to.be.an('object');
-         expect(fn.delete('employees', '3')).to.contain.all.keys(['table', 'where', 'orderBy', 'first', 'count', 'project', 'reduce', 'insert', 'delete', 'join', 'then']);
      });
      it('If the operation is succesful, the result is an id or an array of ids', (done: Function) => {
          fn.delete('departments', ['5', '7'])

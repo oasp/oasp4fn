@@ -3,4 +3,4 @@ test/
 .vscode/
 tsconfig.json
 mocha.opts
-out/**/*.js.map
+dist/**/*.js.map
