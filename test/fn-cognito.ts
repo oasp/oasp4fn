@@ -1,6 +1,6 @@
 
 import { expect } from 'chai';
-import Oasp4Fn from '../src/index';
+import fn from '../src/index';
 import cognito from '../src/adapters/fn-cognito';
 import * as AWS from 'aws-sdk';
 
@@ -8,7 +8,6 @@ let region = process.env.REGION || 'us-west-2';
 let pool: { clientId: string, userPoolId: string};
 let aws_cognito = new AWS.CognitoIdentityServiceProvider({ region: region });
 
-let fn = new Oasp4Fn();
 fn.setAuth(cognito);
 
 before(async function () {
@@ -27,7 +26,8 @@ before(async function () {
     }
 });
 
-describe('login', () => {
+describe('login', function () {
+    this.timeout(0);
     it('The function should return a reference to the self object', (done: Function) => {
          try {
              expect(fn.login('user', 'P@ssw0rd', pool)).to.be.an('object');
@@ -90,7 +90,8 @@ describe('login', () => {
         });
 });
 
-describe('refresh', () => {
+describe('refresh', function () {
+    this.timeout(0);
     let refresh_token: string;
     before((done: Function) => {
         fn.login('user', 'P@ssw0rd', pool)

@@ -1,12 +1,11 @@
 
 import { expect } from 'chai';
-import Oasp4Fn from '../src/index';
+import fn from '../src/index';
 import s3 from '../src/adapters/fn-s3';
 import * as AWS from 'aws-sdk';
 
 let aws_s3 = new AWS.S3();
 
-let fn = new Oasp4Fn();
 fn.setStorage(s3);
 
 before(async function () {
@@ -38,8 +37,8 @@ before(async function () {
     }
 });
 
-describe('upload', () => {
-
+describe('upload', function () {
+    this.timeout(0);
      it('The function should return a reference to the self object', () => {
          expect(fn.upload('oasp4fn', 'test.txt', new Buffer('someBuffer'))).to.be.an('object');
      });
@@ -85,8 +84,8 @@ describe('upload', () => {
      });
 });
 
-describe('bucket', () => {
-
+describe('bucket', function () {
+     this.timeout(0);
      it('The function should return a reference to the self object', () => {
          expect(fn.bucket('oasp4fn')).to.be.an('object');
      });
@@ -152,7 +151,8 @@ describe('bucket', () => {
      });
 });
 
-describe('deleteObject', () => {
+describe('deleteObject', function () {
+    this.timeout(0);
      before((done: Function) => {
         let promises: Promise<object>[] = [];
         promises.push(<Promise<object>>fn.upload('oasp4fn', 'test1.txt', new Buffer('test')).promise());

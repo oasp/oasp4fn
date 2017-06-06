@@ -1,6 +1,6 @@
 
 import { expect } from 'chai';
-import Oasp4Fn from '../src/index';
+import fn from '../src/index';
 import dynamo from '../src/adapters/fn-dynamo';
 let DynamoDB = require('aws-sdk/clients/dynamodb');
 
@@ -9,7 +9,6 @@ let region = process.env.REGION || 'us-west-2';
 let dynamodb = new DynamoDB({ endpoint: endpoint, region: region });
 let docClient = new DynamoDB.DocumentClient({ endpoint: endpoint, region: region });
 
-let fn = new Oasp4Fn();
 fn.setDB(dynamo, { endpoint: endpoint, region: region });
 
 interface Employee {
@@ -220,7 +219,7 @@ describe('table', () => {
 
 describe('where', () => {
      it('The function should return a reference to the self object', () => {
-         expect(fn.where('id')).to.be.an('object');
+         expect(fn.table('employees').where('id')).to.be.an('object');
      });
      it('If the operation is succesful, the resolution should be an Array<Object>', (done: Function) => {
          fn.table('employees')
@@ -269,7 +268,7 @@ describe('where', () => {
 
 describe('orderBy', () => {
      it('The function should return a reference to the self object', () => {
-         expect(fn.orderBy('id')).to.be.an('object');
+         expect(fn.table('employees').orderBy('id')).to.be.an('object');
      });
      it("If you don't specify an order, the result array is sorted ascendingly", (done: Function) => {
          fn.table('employees')
@@ -324,6 +323,114 @@ describe('orderBy', () => {
                     }
              });
      });
+     it("If you pass more than one attribute, the result array should be sorted having in mind all the atributtes", (done: Function) => {
+         fn.table('employees')
+             .orderBy(['department', 'id'], 'desc')
+             .then((res: Employee[]) => {
+                    try {
+                        expect(res).to.be.an('array');
+                        expect(res).to.have.lengthOf(4);
+                        let i = res.length;
+                        while (--i) {
+                            expect(res[i].department <= res[i - 1].department).to.be.true;
+                            if(res[i].department === res[i - 1].department)
+                                expect(res[i].id <= res[i - 1].id).to.be.true;
+                        }
+                    }
+                    catch (err) {
+                        done(err);
+                    }
+                }, (err: Error) => {
+                    try {
+                        expect(err).to.be.undefined;
+                    }
+                    catch (err) {
+                        done(err);
+                    }
+             });
+        fn.table('employees')
+             .orderBy(['department', 'id'], ['desc', 'asc'])
+             .then((res: Employee[]) => {
+                    try {
+                        expect(res).to.be.an('array');
+                        expect(res).to.have.lengthOf(4);
+                        let i = res.length;
+                        while (--i) {
+                            expect(res[i].department <= res[i - 1].department).to.be.true;
+                            if(res[i].department === res[i - 1].department)
+                                expect(res[i].id >= res[i - 1].id).to.be.true;
+                        }
+                        done();
+                    }
+                    catch (err) {
+                        done(err);
+                    }
+                }, (err: Error) => {
+                    try {
+                        expect(err).to.be.undefined;
+                        done();
+                    }
+                    catch (err) {
+                        done(err);
+                    }
+             });
+     });
+     it("If you pass more orders than attributes, the first orders corresponding to the attributtes length should be used", (done: Function) => {
+         fn.table('employees')
+             .orderBy(['department', 'id'], ['desc', 'asc', 'des'])
+             .then((res: Employee[]) => {
+                    try {
+                        expect(res).to.be.an('array');
+                        expect(res).to.have.lengthOf(4);
+                        let i = res.length;
+                        while (--i) {
+                            expect(res[i].department <= res[i - 1].department).to.be.true;
+                            if(res[i].department === res[i - 1].department)
+                                expect(res[i].id >= res[i - 1].id).to.be.true;
+                        }
+                        done();
+                    }
+                    catch (err) {
+                        done(err);
+                    }
+                }, (err: Error) => {
+                    try {
+                        expect(err).to.be.undefined;
+                        done();
+                    }
+                    catch (err) {
+                        done(err);
+                    }
+             });
+     });
+     it("If you pass less orders than attributes, the unspecified orders should be 'asc'", (done: Function) => {
+         fn.table('employees')
+             .orderBy(['department', 'id'], ['desc'])
+             .then((res: Employee[]) => {
+                    try {
+                        expect(res).to.be.an('array');
+                        expect(res).to.have.lengthOf(4);
+                        let i = res.length;
+                        while (--i) {
+                            expect(res[i].department <= res[i - 1].department).to.be.true;
+                            if(res[i].department === res[i - 1].department)
+                                expect(res[i].id >= res[i - 1].id).to.be.true;
+                        }
+                        done();
+                    }
+                    catch (err) {
+                        done(err);
+                    }
+                }, (err: Error) => {
+                    try {
+                        expect(err).to.be.undefined;
+                        done();
+                    }
+                    catch (err) {
+                        done(err);
+                    }
+             });
+     });
      it("If the especified attribute doesn't exist, the function return the same array", (done: Function) => {
          fn.table('employees')
              .orderBy('error')
@@ -357,7 +464,7 @@ describe('first', () => {
              });
      });
      it('The function should return a reference to the self object', () => {
-         expect(fn.first()).to.be.an('object');
+         expect(fn.table('employees').first()).to.be.an('object');
      });
      it('If the operation is succesful, the result is the first object of the table', (done: Function) => {
          fn.table('employees')
@@ -408,7 +515,7 @@ describe('first', () => {
 
 describe('count', () => {
      it('The function should return a reference to the self object', () => {
-         expect(fn.count()).to.be.an('object');
+         expect(fn.table('employees').count()).to.be.an('object');
      });
      it('If the operation is succesful, the result is the number of items of the table', (done: Function) => {
          fn.table('employees')
@@ -458,7 +565,7 @@ describe('count', () => {
 
 describe('project', () => {
      it('The function should return a reference to the self object', () => {
-         expect(fn.project('hi', 'bye')).to.be.an('object');
+         expect(fn.table('employees').project('hi', 'bye')).to.be.an('object');
      });
      it('If the operation is succesful, the result is all the objects of the table but only with the specified properties', (done: Function) => {
          fn.table('employees')
@@ -467,12 +574,11 @@ describe('project', () => {
                     try {
                         expect(res).to.be.an('array');
                         expect(res).to.have.lengthOf(4);
-                        let i = res.length;
-                        while (i--) {
-                            expect(res[i]).to.be.an('object');
-                            expect(res[i]).to.have.all.keys(['id', 'firstname']);
-                            expect(res[i]).to.not.have.all.keys(['surname', 'department']);
-                        }
+                        res.forEach(o => {
+                            expect(o).to.be.an('object');
+                            expect(o).to.have.all.keys(['id', 'firstname']);
+                            expect(o).to.not.have.all.keys(['surname', 'department']);
+                        })
                         done();
                     }
                     catch (err) {
@@ -535,7 +641,7 @@ describe('project', () => {
 
 describe('reduce', () => {
      it('The function should return a reference to the self object', () => {
-         expect(fn.reduce((result: object[], o: any) => {
+         expect(fn.table('employees').reduce((result: object[], o: any) => {
                 result.push(o);
                 return result;
             }, [])).to.be.an('object');
@@ -551,12 +657,11 @@ describe('reduce', () => {
                     try {
                         expect(res).to.be.an('array');
                         expect(res).to.have.lengthOf(4);
-                        let i = res.length;
-                        while (i--) {
-                            expect(res[i]).to.be.an('object');
-                            expect(res[i]).to.have.all.keys(['id', 'firstname', 'surname', 'department']);
-                            expect(res[i].department).to.be.equal('1');
-                        }
+                        res.forEach(o => {
+                            expect(o).to.be.an('object');
+                            expect(o).to.have.all.keys(['id', 'firstname', 'surname', 'department']);
+                            expect(o.department).to.be.equal('1');
+                        });
                         done();
                     }
                     catch (err) {
@@ -603,7 +708,6 @@ describe('reduce', () => {
 describe('join', () => {
      it('The function should return a reference to the self object', () => {
          expect(fn.table('employees').table('departments').join('department', 'id')).to.be.an('object');
-         fn.then();
      });
      it('If the operation is succesful, the result is a joined table', (done: Function) => {
          fn.table('employees')
