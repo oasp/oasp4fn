@@ -6,6 +6,7 @@ let yml_gen = require('../dist/generator/index');
 let fs = require('fs');
 let path = require('path');
 let _ = require('lodash');
+let chalk = require('chalk');
 
 const HELP = `
 Usage: oasp4fn [provider] [options]
@@ -16,12 +17,24 @@ Supported Providers: aws (by default aws)
 Options:
   -o, --opts file       file with the options for the yml generation
   -p, --path directory  directory where the handlers are stored
+  -e, --express         generates an express app.ts file
   -h, --help            display the help
 `
 
-function logError(msg) {
-    if(msg) {
-        console.log(msg)
+function logError(err) {
+    if(err) {
+        switch(typeof err) {
+            case 'string':
+                console.log(` ${chalk.red('Error!')} ${err}`)
+                break;
+            case 'object':
+                if(err.message) {
+                    console.log(` ${chalk.red('Error!')} ${err.message}`)
+                    break;
+                }
+            default:
+            console.log(` ${chalk.red('Error!')}\n  ${err}`)
+        }
     }
     else {
         console.log(HELP)
@@ -48,6 +61,10 @@ function oasp4fn() {
                     _.set(opts, 'path', _.remove(list, (value, j) => {
                         return j === (i + 1)
                     })[0])
+                    break;
+                case '--express':
+                case '-e':
+                    opts.app = true;
                     break;
                 case '--help':
                 case '-h':

@@ -207,7 +207,7 @@ class Oasp4Fn {
         });
         return this;
     }
-    map(iteratee: _.ObjectIterator<object, any>) {
+    map(iteratee: _.ObjectIterator<any, any> | string) {
         this.solution[0] = this.solution[0].then((res: object[]): any => {
             if (_.isObject(res))
                 return _.map(res, iteratee);
@@ -215,7 +215,7 @@ class Oasp4Fn {
         });
         return this;
     }
-    filter(iteratee: object) {
+    filter(iteratee: any) {
         this.solution[0] = this.solution[0].then((res: object[]): any => {
             if (_.isObject(res))
                 return _.filter(res, iteratee);
@@ -224,7 +224,7 @@ class Oasp4Fn {
         this.solution
         return this;
     }
-    reduce(iteratee: _.MemoIterator<object, object>, accumulator?: any[] | object | number) {
+    reduce(iteratee: _.MemoIterator<any, any>, accumulator?: any) {
         let _accumulator = accumulator ? accumulator : [];
         this.solution[0] = this.solution[0].then((res: _.Dictionary<string | object>) => {
             if (_.isObject(res))
@@ -255,7 +255,7 @@ class Oasp4Fn {
                         if(typeof item === 'string')
                             accum.push(item);
                         else if(_.size(item) === 1)
-                            accum.push(<string>_.get(item, key));
+                            accum.push(<string>_.get(item, _.keys(item)[0]));
                         return accum
                     }, []));
                 }

@@ -3,9 +3,11 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as _ from 'lodash';
 import * as yml from 'js-yaml';
+import * as chalk from 'chalk';
 
 const DEFAULTS = {
     path: 'handlers',
+    app: false,
     aws: {
         provider: {name: 'aws', runtime: 'nodejs6.10', region: 'us-west-2'},
         plugins: ['serverless-webpack', 'serverless-offline']
@@ -70,7 +72,8 @@ export function run(opts: any) {
     }
     serviceName(options);
     let serverless_yml = tscParser(files, options);
-    generateApp(serverless_yml);
+    if(DEFAULTS.app)
+        generateApp(serverless_yml);
     generateYaml(_.omit(serverless_yml, ['imports', 'routes']));
     generateWebpack(files);
 }
@@ -95,6 +98,10 @@ let extractFiles = (paths: string[], files: string[]): string[] => {
 let defineOptions = (opts: any) => {
     if (!opts.path)
         opts.path = DEFAULTS.path;
+    if (opts.app) {
+        DEFAULTS.app = opts.app;
+        _.unset(opts, 'app');
+    }
     if (opts.provider) {
         if (typeof opts.provider === 'string') {
             let providerObject = <{provider: object}>_.get(DEFAULTS, opts.provider);
@@ -122,11 +129,9 @@ let generateYaml = (obj: any) => {
     let dump = yml.safeDump(obj);
     fs.writeFile('serverless.yml', dump, (err) => {
         if (err)
-            console.log('Error creating severless.yml');
-        else {
-            console.log('serverless.yml created succesfully');
-            console.log(dump);
-        }
+            console.log(`  ${chalk.red('Error')} creating severless.yml`);
+        else 
+            console.log(`  ${chalk.blue('serverless.yml')} created succesfully`);
     });
 };
 
@@ -138,11 +143,9 @@ let generateWebpack = (files: any) => {
     out = `${out}\t}\n};`;
     fs.writeFile('webpack.config.js', out, (err) => {
         if (err)
-            console.log('Error creating webpack.config.json');
-        else {
-            console.log('webpack.config.json created succesfully');
-            console.log(out);
-        }
+            console.log(`  ${chalk.red('Error')} creating webpack.config.json`);
+        else
+            console.log(`  ${chalk.blue('webpack.config.json')} created succesfully`);
     });
 };
 
@@ -171,10 +174,8 @@ app.listen(app.get('port'), () => {
 
     fs.writeFile(`${DEFAULTS.path}/app.ts`, app, (err) => {
         if (err)
-            console.log('Error creating app.ts');
-        else {
-            console.log('app.ts created succesfully');
-            console.log(app);
-        }
+            console.log(`  ${chalk.red('Error')} creating app.ts`);
+        else 
+            console.log(`  ${chalk.blue('app.ts')} created succesfully`);
     });
 };

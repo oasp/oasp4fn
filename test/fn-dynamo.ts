@@ -594,6 +594,29 @@ describe('project', () => {
                     }
              });
      });
+     it('The operation can be done over a json object, and the result should be an object with the projected attributes', (done: Function) => {
+         fn.table('employees', '1')
+             .project('id')
+             .then((res: {id: string}) => {
+                    try {
+                        expect(res).to.be.an('object').that.has.all.keys('id');
+                        expect(res).to.not.have.all.keys(['surname', 'department', 'firstname']);
+                        expect(res.id).to.be.equal('1');
+                        done();
+                    }
+                    catch (err) {
+                        done(err);
+                    }
+                }, (err: Error) => {
+                    try {
+                        expect(err).to.be.undefined;
+                        done();
+                    }
+                    catch (err) {
+                        done(err);
+                    }
+             });
+     });
      it('If the function is called with no parametters, the operation should return an error', (done: Function) => {
          fn.table('employees')
              .project()
@@ -677,7 +700,34 @@ describe('reduce', () => {
                     }
              });
      });
-     it("If the operation isn't done over an array, the operation should return an error", (done: Function) => {
+     it('The operation can be done over a json object, and the result should be specified by the fucntion and initial accumulator passed', (done: Function) => {
+         fn.table('employees', '1')
+             .reduce((accum: string[], o: string) => {
+                 if(typeof o === 'string')
+                     accum.push(o);
+                 return accum;
+             })
+             .then((res: string[]) => {
+                    try {
+                        expect(res).to.be.an('array');
+                        expect(res).to.have.lengthOf(4);
+                        expect(res).to.have.members(['1', 'Paquito', 'Chocolatero', '1']);
+                        done();
+                    }
+                    catch (err) {
+                        done(err);
+                    }
+                }, (err: Error) => {
+                    try {
+                        expect(err).to.be.undefined;
+                        done();
+                    }
+                    catch (err) {
+                        done(err);
+                    }
+             });
+     });
+     it("If the operation isn't done over an object, the operation should return an error", (done: Function) => {
          fn.table('employees')
              .count()
              .reduce((result: Employee[], o: Employee) => {
@@ -685,7 +735,161 @@ describe('reduce', () => {
                  result.push(o);
                  return result;
              }, [])
-             .then((res: Array<Object>) => {
+             .then((res: object[]) => {
+                    try {
+                       expect(res).to.be.undefined;
+                       done();
+                    }
+                    catch (err) {
+                        done(err);
+                    }
+                }, (err: Error) => {
+                    try {
+                        expect(err).to.be.a('string');
+                        done();
+                    }
+                    catch (err) {
+                        done(err);
+                    }
+             });
+     });
+});
+
+describe('map', () => {
+     it('The function should return a reference to the self object', () => {
+         expect(fn.table('employees').map((o: Employee) => o.id)).to.be.an('object');
+     });
+     it('If the operation is succesful, the result are the items of the table but mapped by the specified function', (done: Function) => {
+         fn.table('employees')
+             .map('id')
+             .then((res: string[]) => {
+                    try {
+                        expect(res).to.be.an('array');
+                        expect(res).to.have.lengthOf(4);
+                        res.forEach(o => {
+                            expect(o).to.be.a('string');
+                            expect(Number.parseInt(o)).to.be.within(1, 4);
+                        });
+                        done();
+                    }
+                    catch (err) {
+                        done(err);
+                    }
+                }, (err: Error) => {
+                    try {
+                        expect(err).to.be.undefined;
+                        done();
+                    }
+                    catch (err) {
+                        done(err);
+                    }
+             });
+     });
+     it('The operation can be done over a json object, and the result should be an array', (done: Function) => {
+         fn.table('employees', '1')
+             .map((o: string, key: string) => key)
+             .then((res: string[]) => {
+                    try {
+                        expect(res).to.be.an('array');
+                        expect(res).to.have.lengthOf(4);
+                        expect(res).to.have.members(['firstname', 'id', 'department', 'surname']);
+                        done();
+                    }
+                    catch (err) {
+                        done(err);
+                    }
+                }, (err: Error) => {
+                    try {
+                        expect(err).to.be.undefined;
+                        done();
+                    }
+                    catch (err) {
+                        done(err);
+                    }
+             });
+     });
+     it("If the operation isn't done over an object, the operation should return an error", (done: Function) => {
+         fn.table('employees')
+             .count()
+             .map((o: Employee) => o.id)
+             .then((res: object[]) => {
+                    try {
+                       expect(res).to.be.undefined;
+                       done();
+                    }
+                    catch (err) {
+                        done(err);
+                    }
+                }, (err: Error) => {
+                    try {
+                        expect(err).to.be.a('string');
+                        done();
+                    }
+                    catch (err) {
+                        done(err);
+                    }
+             });
+     });
+});
+
+describe('filter', () => {
+     it('The function should return a reference to the self object', () => {
+         expect(fn.table('employees').filter('id')).to.be.an('object');
+     });
+     it('If the operation is succesful, the result are the items of the table that pass the filter', (done: Function) => {
+         fn.table('employees')
+             .filter('id')
+             .then((res: Employee[]) => {
+                    try {
+                        expect(res).to.be.an('array');
+                        expect(res).to.have.lengthOf(4);
+                        res.forEach(o => {
+                            expect(o).to.be.an('object');
+                            expect(o).to.have.all.keys(['id', 'firstname', 'surname', 'department']);
+                        });
+                        done();
+                    }
+                    catch (err) {
+                        done(err);
+                    }
+                }, (err: Error) => {
+                    try {
+                        expect(err).to.be.undefined;
+                        done();
+                    }
+                    catch (err) {
+                        done(err);
+                    }
+             });
+     });
+     it('The operation can be done over a json object, and the result should be an array', (done: Function) => {
+         fn.table('employees', '1')
+             .filter((o: string, key: string) => key === 'id')
+             .then((res: string[]) => {
+                    try {
+                        expect(res).to.be.an('array');
+                        expect(res).to.have.lengthOf(1);
+                        expect(res).to.have.members(['1']);
+                        done();
+                    }
+                    catch (err) {
+                        done(err);
+                    }
+                }, (err: Error) => {
+                    try {
+                        expect(err).to.be.undefined;
+                        done();
+                    }
+                    catch (err) {
+                        done(err);
+                    }
+             });
+     });
+     it("If the operation isn't done over an object, the operation should return an error", (done: Function) => {
+         fn.table('employees')
+             .count()
+             .map((o: Employee) => o.id)
+             .then((res: object[]) => {
                     try {
                        expect(res).to.be.undefined;
                        done();
@@ -759,7 +963,7 @@ describe('insert', () => {
      it('The function should return a reference to the self object', () => {
          expect(fn.insert('departments', [{id: '7', name: 'Sales'}, {id: '5', name: 'Comercial'}])).to.be.an('object');
      });
-     it('If the operation is succesful, the result is an id or an array of ids', (done: Function) => {
+     it('If the operation is succesful, the result is an id or an array of ids or a id', (done: Function) => {
          fn.insert('departments', [{id: '7', name: 'Sales'}, {id: '5', name: 'Comercial'}])
              .then((res: string[]) => {
                     try {
@@ -781,6 +985,32 @@ describe('insert', () => {
              .then((res: string) => {
                     try {
                         expect(res).to.be.a('string').equal('8');
+                        done();
+                    }
+                    catch (err) {
+                        done(err);
+                    }
+                }, (err: Error) => {
+                    try {
+                        expect(err).to.be.undefined;
+                        done();
+                    }
+                    catch (err) {
+                        done(err);
+                    }
+             });
+     });
+     it('If the operation is not starter, the operation insert the items on which we are operating', (done: Function) => {
+         fn.table('departments')
+         .map((o: Department) => {
+             o.id = (Number.parseInt(o.id) + 8).toString();
+             return o;
+            })
+         .insert()
+             .then((res: string[]) => {
+                    try {
+                        expect(res).to.be.an('array');
+                        expect(res).to.have.lengthOf(7);
                         done();
                     }
                     catch (err) {
@@ -828,6 +1058,7 @@ describe('delete', () => {
                     try {
                         expect(res).to.be.an('array');
                         expect(res).to.have.lengthOf(2);
+                        expect(res).to.have.members(['5', '7']);
                     }
                     catch (err) {
                         done(err);
@@ -844,6 +1075,95 @@ describe('delete', () => {
              .then((res: string) => {
                     try {
                         expect(res).to.be.a('string').equals('8');
+                        done();
+                    }
+                    catch (err) {
+                        done(err);
+                    }
+                }, (err: Error) => {
+                    try {
+                        expect(err).to.be.undefined;
+                        done();
+                    }
+                    catch (err) {
+                        done(err);
+                    }
+             });
+     });
+     it('If the operation is not starter, the operation delete the items on which we are operating', (done: Function) => {
+          fn.table('departments', '9')
+             .project('id')
+             .delete()
+             .then((res: string) => {
+                    try {
+                        expect(res).to.be.an('string').equal('9');
+                    }
+                    catch (err) {
+                        done(err);
+                    }
+                }, (err: Error) => {
+                    try {
+                        expect(err).to.be.undefined;
+                    }
+                    catch (err) {
+                        done(err);
+                    }
+             });
+             fn.table('departments', ['10','11','12'])
+                 .project('id')
+                 .delete()
+                 .then((res: string[]) => {
+                    try {
+                        expect(res).to.be.an('array');
+                        expect(res).to.have.lengthOf(3);
+                        expect(res).to.have.members(['10','11','12']);
+                    }
+                    catch (err) {
+                        done(err);
+                    }
+                }, (err: Error) => {
+                    try {
+                        expect(err).to.be.undefined;
+                    }
+                    catch (err) {
+                        done(err);
+                    }
+             });
+            fn.table('departments', '13')
+                .reduce((accum: string, o: string | number[], key: string) => {
+                    if(key === 'id')
+                        return o;
+                    else
+                        return accum;
+                }, '')
+                .delete()
+                .then((res: string) => {
+                try {
+                    expect(res).to.be.an('string').equal('13');
+                }
+                catch (err) {
+                    done(err);
+                }
+            }, (err: Error) => {
+                try {
+                    expect(err).to.be.undefined;
+                }
+                catch (err) {
+                    done(err);
+                }
+            });
+         fn.table('departments')
+             .reduce((accum: string[], o: Department) => {
+                 if(Number.parseInt(o.id) > 13)
+                     accum.push(o.id)
+                 return accum
+                })
+             .delete()
+             .then((res: string[]) => {
+                    try {
+                        expect(res).to.be.an('array');
+                        expect(res).to.have.lengthOf(2);
+                        expect(res).to.have.members([ '15', '16']);
                         done();
                     }
                     catch (err) {

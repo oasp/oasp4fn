@@ -303,12 +303,5 @@ export interface FnAuthService {
 }
 
 export interface ServerlessConfiguration {
-    /*integration?: string;
-    path?: string;
-    cors?: true;
-    authorizer?: string | {arn: string, claims?: string[]};
-    response?:  { header: {[name: string]: string}, template?: {[name: string]: string}};
-    statusCodes?: {[code: number]: {pattern: string, header?: {[name: string]: string};template?: {[name: string]: string}}};
-    bucket?: string;*/
     [name: string]: any;
 }

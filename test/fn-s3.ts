@@ -158,6 +158,8 @@ describe('deleteObject', function () {
         promises.push(<Promise<object>>fn.upload('oasp4fn', 'test1.txt', new Buffer('test')).promise());
         promises.push(<Promise<object>>fn.upload('oasp4fn', 'test2.txt', new Buffer('test')).promise());
         promises.push(<Promise<object>>fn.upload('oasp4fn', 'test3.txt', new Buffer('test')).promise());
+        promises.push(<Promise<object>>fn.upload('oasp4fn', 'test4.txt', new Buffer('test')).promise());
+        promises.push(<Promise<object>>fn.upload('oasp4fn', 'test5.txt', new Buffer('test')).promise());
         Promise.all(promises)
             .then((res: any) => {
                 done();
@@ -190,7 +192,30 @@ describe('deleteObject', function () {
             .then((res: string[]) => {
             try {
                 expect(res).to.be.an('array');
-                expect(res).to.include.members(['test2.txt', 'test3.txt']);
+                expect(res).to.have.lengthOf(2);
+                expect(res).to.have.members(['test2.txt', 'test3.txt']);
+                done();
+            }
+            catch (err) {
+                done(err);
+            }
+         }, (err: Error) => {
+             try {
+                expect(err).to.be.undefined;
+                done();
+             }
+             catch (err) {
+                done(err);
+             }
+         });
+     });
+     it('If the operation is not starter, the operation delete the objects on which we are operating', (done: Function) => {
+
+         fn.bucket('oasp4fn')
+            .deleteObject()
+            .then((res: string[]) => {
+            try {
+                expect(res).to.be.an('array');
                 done();
             }
             catch (err) {
