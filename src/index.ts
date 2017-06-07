@@ -302,7 +302,7 @@ class Oasp4Fn {
                 }));
         return this;
     }
-    deleteObject(){
+    deleteObject() {
         if ((<{bucketName: string}>this.names).bucketName) {
             this.solution[0] = this.solution[0].then((res: any) => {
                 if(Array.isArray(res)) {

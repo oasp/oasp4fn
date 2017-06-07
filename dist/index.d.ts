@@ -1,23 +1,12 @@
 import { MemoIterator, ObjectIterator } from 'lodash'
 
-declare class Oasp4Fn {
-    private db: FnDBService;
-    private storage: FnStorageService;
-    private auth: FnAuthService;
-    private solution: Array<Promise<object[] | object | string | string[] | number | never>>;
-    private tableName: string;
-    /**
-     * Creates an instance of Oasp4Fn.
-     * 
-     * @memberof Oasp4Fn
-     */
-    constructor();
+interface QueryStarters {
     /**
      * Dummy function, that especifies the event configuration for a serverless function
      * 
      * @param {ServerlessConfiguration} configuration 
      * 
-     * @memberof Oasp4Fn
+     * @memberof QueryStarters
      */
     config(configuration: ServerlessConfiguration): void
     /**
@@ -26,7 +15,7 @@ declare class Oasp4Fn {
      * @param {FnDBService} db_service 
      * @param {object} [options] 
      * 
-     * @memberOf Oasp4Fn
+     * @memberof QueryStarters
      */
     setDB(db_service: FnDBService, options?: object): void
     /**
@@ -35,7 +24,7 @@ declare class Oasp4Fn {
      * @param {FnStorageService} db_service 
      * @param {object} [options] 
      * 
-     * @memberOf Oasp4Fn
+     * @memberof QueryStarters
      */
     setStorage(db_service: FnStorageService, options?: object): void
     /**
@@ -44,9 +33,107 @@ declare class Oasp4Fn {
      * @param {FnAuthService} auth_service 
      * @param {object} [options] 
      * 
-     * @memberof Oasp4Fn
+     * @memberof QueryStarters
      */
     setAuth(auth_service: FnAuthService, options?: object): void
+    /**
+     * Function that use the getItems or getItems functionalities to get items of a table with the given name
+     * 
+     * @param {string} name 
+     * @param {(string | string[])} [ids] 
+     * @returns {Oasp4Fn} 
+     * 
+     * @memberof QueryStarters
+     */
+    table(name: string, ids?: string | string[]): Oasp4Fn
+    /**
+     * Function to insert new items in a table
+     * 
+     * @param {string} table_name 
+     * @param {(Object | object[])} items 
+     * @returns {Oasp4Fn} 
+     * 
+     * @memberof QueryStarters
+     */
+    insert(table_name: string, items: Object | object[]): Oasp4Fn
+    /**
+     * Function to delete one or more items in a table
+     * 
+     * @param {string} table_name 
+     * @param {(string | string[])} ids 
+     * @returns {Oasp4Fn} 
+     * 
+     * @memberof QueryStarters
+     */
+    delete(table_name: string, ids: string | string[]): Oasp4Fn
+    /**
+     * Function that list the elements of a bucket or download one if an identifier is passed
+     * 
+     * @param {string} bucket_name 
+     * @param {string} [id] 
+     * @returns {Oasp4Fn} 
+     * 
+     * @memberof QueryStarters
+     */
+    bucket(bucket_name: string, id?: string): Oasp4Fn
+    /**
+     * Function that upload an object to a bucket
+     * 
+     * @param {string} bucket_name 
+     * @param {string} id 
+     * @param {Buffer} buffer 
+     * @param {string} [mimetype] 
+     * @param {string} [access] 
+     * @returns {Oasp4Fn} 
+     * 
+     * @memberof QueryStarters
+     */
+    upload(bucket_name: string, id: string, buffer: Buffer, mimetype?: string, access?: string): Oasp4Fn
+    /**
+     * Function to delete one or more objects in a bucket
+     * 
+     * @param {string} bucket_name 
+     * @param {(string | string[])} ids 
+     * @returns {Oasp4Fn} 
+     * 
+     * @memberof QueryStarters
+     */
+    deleteObject(bucket_name: string, ids: string | string[]): Oasp4Fn
+    /**
+     * Function that performs a login into an application
+     * 
+     * @param {string} user 
+     * @param {string} password 
+     * @param {(string | object)} pool 
+     * @returns {Oasp4Fn} 
+     * 
+     * @memberof QueryStarters
+     */
+    login(user: string, password: string, pool: string | object): Oasp4Fn
+    /**
+     * Function that refresh the token/s of a logged user
+     * 
+     * @param {string} refresh_token 
+     * @param {(string | object)} pool 
+     * @returns {Oasp4Fn} 
+     * 
+     * @memberof QueryStarters
+     */
+    refresh(refresh_token: string, pool: string | object): Oasp4Fn
+}
+
+declare class Oasp4Fn {
+    
+    private solution: Array<Promise<object[] | object | string | string[] | number | never>>;
+    private names: {tableName?: string, bucketName?: string};
+    /**
+     * Creates an instance of Oasp4Fn.
+     * @param {(Promise<object[] | object | string | string[] | number | never>)} solution 
+     * @param {{tableName?: string, bucketName?: string}} [names] 
+     * 
+     * @memberof Oasp4Fn
+     */
+    constructor(solution: Promise<object[] | object | string | string[] | number | never>, names?: {tableName?: string, bucketName?: string});
     /**
      * Function that use the getItems or getItems functionalities to get items of a table with the given name
      * 
@@ -71,11 +158,11 @@ declare class Oasp4Fn {
     /**
      * Function that order the elements of a table
      * 
-     * @param {string} attribute 
-     * @param {string} [order] 
+     * @param {(_.Many<string | _.ListIterator<object, any>>)} attribute 
+     * @param {(string | string[])} [order] 
      * @returns {Oasp4Fn} 
      * 
-     * @memberOf Oasp4Fn
+     * @memberof Oasp4Fn
      */
     orderBy(attribute: _.Many<string | _.ListIterator<object, any>>, order?: string | string[]): Oasp4Fn
     /**
@@ -132,26 +219,7 @@ declare class Oasp4Fn {
      * @memberOf Oasp4Fn
      */
     reduce(iteratee: MemoIterator<object, object>, accumulator?: any[] | object | number ): Oasp4Fn
-    /**
-     * Function to insert new items in a table
-     * 
-     * @param {string} table_name 
-     * @param {(Object | object[])} items 
-     * @returns {Oasp4Fn} 
-     * 
-     * @memberOf Oasp4Fn
-     */
-    insert(table_name?: string, items?: Object | object[]): Oasp4Fn
-    /**
-     * Function to delete one or more items in a table
-     * 
-     * @param {string} table_name 
-     * @param {(string | string[])} ids 
-     * @returns {Oasp4Fn} 
-     * 
-     * @memberOf Oasp4Fn
-     */
-    delete(table_name?: string, ids?: string | string[]): Oasp4Fn
+    
     /**
      * Function that perform an inner join of two tables
      * 
@@ -163,59 +231,29 @@ declare class Oasp4Fn {
      */
     join(accessor0: string, accessor1: string): Oasp4Fn
     /**
-     * Function that list the elements of a bucket or download one if an identifier is passed
+     * Function to insert the modified items in a table
      * 
-     * @param {string} bucket_name 
-     * @param {string} [id] 
-     * @returns {Oasp4Fn} 
-     * 
-     * @memberOf Oasp4Fn
-     */
-    bucket(bucket_name: string, id?: string): Oasp4Fn
-    /**
-     * Function that upload an object to a bucket
-     * 
-     * @param {string} bucket_name 
-     * @param {string} id 
-     * @param {Buffer} buffer 
-     * @param {string} [mimetype] 
-     * @param {string} [access] 
-     * @returns {Oasp4Fn} 
-     * 
-     * @memberOf Oasp4Fn
-     */
-    upload(bucket_name: string, id: string, buffer: Buffer, mimetype?: string, access?: string): Oasp4Fn
-    /**
-     * Function to delete one or more objects in a bucket
-     * 
-     * @param {string} bucket_name 
-     * @param {(string | string[])} ids 
-     * @returns {Oasp4Fn} 
-     * 
-     * @memberOf Oasp4Fn
-     */
-    deleteObject(bucket_name: string, ids: string | string[]): Oasp4Fn
-    /**
-     * Function that performs a login into an application
-     * 
-     * @param {string} user 
-     * @param {string} password 
-     * @param {(string | object)} pool 
      * @returns {Oasp4Fn} 
      * 
      * @memberof Oasp4Fn
      */
-    login(user: string, password: string, pool: string | object): Oasp4Fn
+    insert(): Oasp4Fn
     /**
-     * Function that refresh the token/s of a logged user
+     * Function to delete the extracted items in the query
      * 
-     * @param {string} refresh_token 
-     * @param {(string | object)} pool 
      * @returns {Oasp4Fn} 
      * 
      * @memberof Oasp4Fn
      */
-    refresh(refresh_token: string, pool: string | object): Oasp4Fn
+    delete(): Oasp4Fn
+    /**
+     * Function to delete objects specifieds in the query
+     * 
+     * @returns {Oasp4Fn} 
+     * 
+     * @memberof Oasp4Fn
+     */
+    deleteObject(): Oasp4Fn
     /**
      * A then override following the promise/A+ open standard requirements
      * 
@@ -236,7 +274,8 @@ declare class Oasp4Fn {
     promise(): Promise<object[] | object | string | number>
 }
 
-export default Oasp4Fn
+declare let fn: QueryStarters
+export default fn
 
 export interface FnDBService {
     instance: (options?: Object) => void;
