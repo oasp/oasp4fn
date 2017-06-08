@@ -190,7 +190,7 @@ declare class Oasp4Fn {
      * 
      * @memberOf Oasp4Fn
      */
-    project(attributes: string[]): Oasp4Fn
+    project(attributes: string[] | string): Oasp4Fn
     /**
      * Function that iterates over the elements of an Array applying the changes specified by iteratee
      * 

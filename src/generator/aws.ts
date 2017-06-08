@@ -188,17 +188,14 @@ import { ${obj.name} } from '${import_path}';`;
     yml.routes = `
     ${yml.routes}
 app.${obj.oasp4fn.events.method}('/${route}', (req, res) => {
-    let event = {
-        method: req.method,
-        headers: _.mapKeys(req.headers, (value, key) => {
-            if (key === 'authorization')
-                return _.upperFirst(key);
-            return key;
-        }),
-        query: req.query,
-        path: <any>_.reduceRight(req.params, (accum: object, param: string, key: string) => _.set(accum, key, _.trim(param,'"')), {}),
-        body: req.body
-    };
+    let event = getEvent(req);
+    let callback = (err: Error, result: object) => {
+                if (err)
+                    res.status(500).json(err);
+                else
+                    res.json(result);
+                };
+    let context = getContext({name: '${obj.name}', memory: 1024, timeout: 6000}, callback);
     ${obj.name}(event, {}, (err: Error, result: object) => {
         if (err)
             res.status(500).json(err);

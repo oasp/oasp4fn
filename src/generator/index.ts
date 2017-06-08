@@ -165,6 +165,39 @@ app.use(cors());
 app.options('*', cors());
 app.use(bodyParser.json());
 
+const getContext = (opts: {name: string, memory: number, timeout: number}, done: Function) => {
+    let endTime = new Date().getTime() + opts.timeout;
+    return {
+        done: done,
+        succed: (res: object) => done(null, res),
+        fail: (err: Error) => done(err, null),
+        getRemainigTimeInMillis: () => endTime - new Date().getTime(),
+        functionName: name,
+        memoryLimitInMB: opts.memory,
+        functionVersion: \`oasp4fn_functionVersion_for_\${name}\`,
+        invokedFunctionArn: \`oasp4fn_invokedFunctionArn_for_\${name}\`,
+        awsRequestId: \`oasp4fn_awsRequestId_\${Math.random().toString(10).slice(2)}\`,
+        logGroupName: \`oasp4fn_logGroupName_for_\${name}\`,
+        logStreamName: \`oasp4fn_logStreamName_for_\${name}\`,
+        identity: {},
+        clientContext: {},
+    }
+}
+
+const getEvent = (req: express.Request) => {
+    return {
+        method: req.method,
+        headers: _.mapKeys(req.headers, (value, key) => {
+            if (key === 'authorization')
+                return _.upperFirst(key);
+            return key;
+        }),
+        query: req.query,
+        path: <any>_.reduceRight(req.params, (accum: object, param: string, key: string) => _.set(accum, key, _.trim(param,'"')), {}),
+        body: req.body
+    }
+}
+
 ${_.trim(obj.routes)}
 
 app.listen(app.get('port'), () => {
