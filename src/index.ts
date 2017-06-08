@@ -1,3 +1,4 @@
+import { ElasticsearchDestinationUpdate } from 'aws-sdk/clients/firehose';
 import * as _ from 'lodash';
 import { FnDBService, FnStorageService, ServerlessConfiguration, FnAuthService } from '../dist/index';
 let db: FnDBService;
@@ -38,7 +39,10 @@ export default {
     insert: function (table_name: string, items: Object | object[]) {
         let solution;
         if (Array.isArray(items))
-            solution = db.putItems(table_name, items);
+            if (_.isEmpty(items))
+                solution = Promise.resolve([]);
+            else
+                solution = db.putItems(table_name, items);
         else
             solution = db.putItem(table_name, items);
 
@@ -47,7 +51,10 @@ export default {
     delete: function (table_name: string, ids: string | string[]) {
         let solution;
         if (Array.isArray(ids))
-            solution = db.deleteItems(table_name, ids);
+            if (_.isEmpty(ids))
+                solution = Promise.resolve([]);
+            else
+                solution = db.deleteItems(table_name, ids);
         else
             solution = db.deleteItem(table_name, ids);
 
@@ -70,7 +77,10 @@ export default {
     deleteObject: function (bucket_name: string, ids: string | string[]){
         let solution;
         if (Array.isArray(ids))
-            solution = storage.deleteObjects(bucket_name, ids);
+            if (_.isEmpty(ids))
+                solution = Promise.resolve([]);
+            else
+                solution = storage.deleteObjects(bucket_name, ids);
         else
             solution = storage.deleteObject(bucket_name, ids);
 
@@ -236,8 +246,11 @@ class Oasp4Fn {
     insert() {
         if ((<{tableName: string}>this.names).tableName) {
             this.solution[0] = this.solution[0].then((res) => {
-                if(Array.isArray(res)) 
-                    return <any>db.putItems((<{tableName: string}>this.names).tableName, res);
+                if(Array.isArray(res))
+                    if (_.isEmpty(res))
+                        return Promise.resolve([]);
+                    else 
+                        return <any>db.putItems((<{tableName: string}>this.names).tableName, res);
                 else
                     return db.putItem((<{tableName: string}>this.names).tableName, res);
             })
@@ -251,12 +264,15 @@ class Oasp4Fn {
         if ((<{tableName: string}>this.names).tableName) {
             this.solution[0] = this.solution[0].then((res: any) => {
                 if(Array.isArray(res)) {
-                     return <any>db.deleteItems((<{tableName: string}>this.names).tableName, _.reduceRight(res, (accum: string[], item, key) => {
-                        if(typeof item === 'string')
-                            accum.push(item);
-                        else if(_.size(item) === 1)
-                            accum.push(<string>_.get(item, _.keys(item)[0]));
-                        return accum
+                    if (_.isEmpty(res))
+                        return Promise.resolve([]);
+                    else
+                        return <any>db.deleteItems((<{tableName: string}>this.names).tableName, _.reduceRight(res, (accum: string[], item, key) => {
+                            if(typeof item === 'string')
+                                accum.push(item);
+                            else if(_.size(item) === 1)
+                                accum.push(<string>_.get(item, _.keys(item)[0]));
+                            return accum
                     }, []));
                 }
                 else if(_.isObject(res) && _.size(res) === 1)
@@ -306,7 +322,10 @@ class Oasp4Fn {
         if ((<{bucketName: string}>this.names).bucketName) {
             this.solution[0] = this.solution[0].then((res: any) => {
                 if(Array.isArray(res)) {
-                     return <any>storage.deleteObjects((<{bucketName: string}>this.names).bucketName, res);
+                    if (_.isEmpty(res))
+                        return Promise.resolve([]);
+                    else
+                         return <any>storage.deleteObjects((<{bucketName: string}>this.names).bucketName, res);
                 }
                 else
                     return storage.deleteObject((<{bucketName: string}>this.names).bucketName, res)

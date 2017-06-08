@@ -182,6 +182,8 @@ let addToApp = (obj: any, yml: any) => {
     let path = _.trimEnd(_.trimStart(obj.oasp4fn.handler, DEFAULTS.path), '.');
     let import_path = `./${path}`;
     let route = _.replace(_.trimEnd(obj.oasp4fn.events.path, '}'), '{', ':');
+    let memory = obj.oasp4fn.memorySize || yml.provider.memorySize || 1024;
+    let timeout = obj.oasp4fn.timeout || yml.provider.timeout || 6;
     yml.imports = `
 ${yml.imports}
 import { ${obj.name} } from '${import_path}';`;
@@ -195,13 +197,8 @@ app.${obj.oasp4fn.events.method}('/${route}', (req, res) => {
                 else
                     res.json(result);
                 };
-    let context = getContext({name: '${obj.name}', memory: 1024, timeout: 6000}, callback);
-    ${obj.name}(event, {}, (err: Error, result: object) => {
-        if (err)
-            res.status(500).json(err);
-        else
-            res.json(result);
-    });
+    let context = getContext({name: '${obj.name}', memory: ${memory}, timeout: ${timeout * 1000}}, callback);
+    ${obj.name}(event, context, callback);
 });
 `;
 };

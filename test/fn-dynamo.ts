@@ -963,7 +963,7 @@ describe('insert', () => {
      it('The function should return a reference to the self object', () => {
          expect(fn.insert('departments', [{id: '7', name: 'Sales'}, {id: '5', name: 'Comercial'}])).to.be.an('object');
      });
-     it('If the operation is succesful, the result is an id or an array of ids or a id', (done: Function) => {
+     it('If the operation is succesful, the result is an id or an array of ids', (done: Function) => {
          fn.insert('departments', [{id: '7', name: 'Sales'}, {id: '5', name: 'Comercial'}])
              .then((res: string[]) => {
                     try {
@@ -1025,6 +1025,44 @@ describe('insert', () => {
                         done(err);
                     }
              });
+     });
+     it('If the operation it\'s done over an empty array, the result should be an empty array', (done: Function) => {
+        fn.insert('employees', [])
+            .then((res: string[]) => {
+                try {
+                    expect(res).to.be.an('array').empty;
+                }
+                catch (err) {
+                    done(err);
+                }
+            }, (err: Error) => {
+                try {
+                    expect(err).to.not.be.null;
+                }
+                catch (err) {
+                    done(err);
+                }
+            });
+        fn.table('employees')
+            .where('id', '=', 'x')
+            .insert()
+            .then((res: string[]) => {
+                try {
+                    expect(res).to.be.an('array').empty;
+                    done()
+                }
+                catch (err) {
+                    done(err);
+                }
+            }, (err: Error) => {
+                try {
+                    expect(err).to.not.be.null;
+                    done()
+                }
+                catch (err) {
+                    done(err);
+                }
+            });
      });
      it('If the operation fail, the resolution should be an error', (done: Function) => {
          fn.insert('employee', {id: '7', name: 'Sales'})
@@ -1178,6 +1216,45 @@ describe('delete', () => {
                         done(err);
                     }
              });
+     });
+     it('If the operation it\'s done over an empty array, the result should be an empty array', (done: Function) => {
+        fn.delete('employees', [])
+            .then((res: string[]) => {
+                try {
+                    expect(res).to.be.an('array').empty;
+                }
+                catch (err) {
+                    done(err);
+                }
+            }, (err: Error) => {
+               try {
+                    expect(err).to.not.be.null;
+                    done()
+                }
+                catch (err) {
+                    done(err);
+                }
+            });
+        fn.table('employees')
+            .where('id', 'x')
+            .delete()
+            .then((res: string[]) => {
+                try {
+                    expect(res).to.be.an('array').empty;
+                    done()
+                }
+                catch (err) {
+                    done(err);
+                }
+            }, (err: Error) => {
+                try {
+                    expect(err).to.not.be.null;
+                    done()
+                }
+                catch (err) {
+                    done(err);
+                }
+            });
      });
      it('If the operation fail, the resolution should be an error', (done: Function) => {
          fn.delete('employee', '3')

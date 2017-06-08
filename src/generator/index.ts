@@ -180,7 +180,7 @@ const getContext = (opts: {name: string, memory: number, timeout: number}, done:
         logGroupName: \`oasp4fn_logGroupName_for_\${name}\`,
         logStreamName: \`oasp4fn_logStreamName_for_\${name}\`,
         identity: {},
-        clientContext: {},
+        clientContext: {}
     }
 }
 
