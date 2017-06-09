@@ -172,13 +172,13 @@ const getContext = (opts: {name: string, memory: number, timeout: number}, done:
         succed: (res: object) => done(null, res),
         fail: (err: Error) => done(err, null),
         getRemainigTimeInMillis: () => endTime - new Date().getTime(),
-        functionName: name,
+        functionName: opts.name,
         memoryLimitInMB: opts.memory,
-        functionVersion: \`oasp4fn_functionVersion_for_\${name}\`,
-        invokedFunctionArn: \`oasp4fn_invokedFunctionArn_for_\${name}\`,
+        functionVersion: \`oasp4fn_functionVersion_for_\${opts.name}\`,
+        invokedFunctionArn: \`oasp4fn_invokedFunctionArn_for_\${opts.name}\`,
         awsRequestId: \`oasp4fn_awsRequestId_\${Math.random().toString(10).slice(2)}\`,
-        logGroupName: \`oasp4fn_logGroupName_for_\${name}\`,
-        logStreamName: \`oasp4fn_logStreamName_for_\${name}\`,
+        logGroupName: \`oasp4fn_logGroupName_for_\${opts.name}\`,
+        logStreamName: \`oasp4fn_logStreamName_for_\${opts.name}\`,
         identity: {},
         clientContext: {}
     }
