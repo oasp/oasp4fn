@@ -134,10 +134,10 @@ fs.readFile('./README.md', async (err, data) => {
 fn.setAuth(cognito);
 
 let cognitoAsyncOps = async () => {
-    let tokens = await fn.login('user', 'password', {clientId: '30jlckjp9gakj0vsooip4r0h4u', userPoolId: 'us-west-2_MdoQa7sAP'}).promise()
+    let tokens = await fn.login('user', 'password', {clientId: '7i7cv6peukkugtcjvnhvmc4moe', userPoolId: 'us-west-2_1511o0vuo'}).promise()
     console.log('\nLogin with cognito');
     console.log(tokens);
-    tokens = await fn.refresh((<{RefreshToken: string}>tokens).RefreshToken, {clientId: '30jlckjp9gakj0vsooip4r0h4u', userPoolId: 'us-west-2_MdoQa7sAP'}).promise();
+    tokens = await fn.refresh((<{RefreshToken: string}>tokens).RefreshToken, {clientId: '7i7cv6peukkugtcjvnhvmc4moe', userPoolId: 'us-west-2_1511o0vuo'}).promise();
     console.log('\nRefreshing tokens with cognito');
     console.log(tokens);
 }

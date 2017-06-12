@@ -22,7 +22,7 @@ const DEFAULTS = {
             Action: [
                 's3:*'
             ],
-            Resource: 'arn:aws:s3:*:*:*'
+            Resource: '*'
         }
     ]
 };
