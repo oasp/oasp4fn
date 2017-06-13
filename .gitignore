@@ -56,10 +56,7 @@ node_modules/
 
 
 # Exclude tsc generated files
-dist/*.js
-dist/*.js.map
-dist/**/*.js
-dist/**/*.js.map
+dist/
 
 # Elastic Beanstalk Files
 
