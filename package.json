@@ -20,7 +20,8 @@
     "sample": "node dist/samples.js",
     "test": "mocha --opts mocha.opts",
     "test:auto": "mocha --opts mocha.opts --watch",
-    "prepublish": "npm run build && cpx src/types/**/* dist"
+    "prepublish": "npm run build && cpx src/types/**/* dist",
+    "release": "np"
   },
   "keywords": [
     "cloud",
@@ -46,7 +47,8 @@
     "@types/mocha": "^2.2.39",
     "@types/node": "^7.0.5",
     "chai": "^3.5.0",
-    "cpx": "^1.5.0"
+    "cpx": "^1.5.0",
+    "np": "^2.16.0"
   },
   "dependencies": {
     "aws-sdk": "2.20.x",
