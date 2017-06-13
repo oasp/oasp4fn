@@ -8,7 +8,7 @@ export default {
         s3 = new AWS.S3(options);
     },
     getObject: function (bucket: string, id: string) {
-         return s3.getObjectTorrent({ Bucket: bucket, Key: id }).promise()
+         return <Promise<Error | Buffer>>s3.getObjectTorrent({ Bucket: bucket, Key: id }).promise()
              .then((res: AWS.S3.GetObjectTorrentOutput) => {
                 return res.Body;
              }, (err: Error) => {
