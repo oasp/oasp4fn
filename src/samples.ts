@@ -1,13 +1,13 @@
-import fn from './index';
+import oasp4fn from './index';
 import dynamo from './adapters/fn-dynamo';
 import s3 from './adapters/fn-s3';
 import cognito from './adapters/fn-cognito';
 import * as fs from 'fs';
 
 // Dynamo
-fn.setDB(dynamo);
+oasp4fn.setDB(dynamo);
 
-fn.table('employees')
+oasp4fn.table('employees')
     .then((res: object[]) => {
         console.log('\nTable employees');
         console.log(res);
@@ -15,7 +15,7 @@ fn.table('employees')
         console.log(err);
     });
 
-fn.table('departments')
+oasp4fn.table('departments')
     .then((res: object[]) => {
         console.log('\nTable departments');
         console.log(res);
@@ -23,7 +23,7 @@ fn.table('departments')
         console.log(err);
     });
 
-fn.insert('employees', {id: '5', firstname: 'Pepe', surname: 'Chocolatero', department: '1'})
+oasp4fn.insert('employees', {id: '5', firstname: 'Pepe', surname: 'Chocolatero', department: '1'})
     .then((res: string) => {
         console.log('\nInsert of the employee: {id: "5", firstname: "Pepe", surname: "Chocolatero", department: "1"}');
         console.log(res);
@@ -31,7 +31,7 @@ fn.insert('employees', {id: '5', firstname: 'Pepe', surname: 'Chocolatero', depa
         console.log(err);
     });
 
-fn.delete('employees', '1')
+oasp4fn.delete('employees', '1')
     .then((res: string) => {
         console.log('\nDelete of the employee with id 1');
         console.log(res);
@@ -39,7 +39,7 @@ fn.delete('employees', '1')
         console.log(err);
     });
 
-fn.table('employees')
+oasp4fn.table('employees')
     .then((res: object[]) => {
         console.log('\nThe table employees after the insert and delete');
         console.log(res);
@@ -47,7 +47,7 @@ fn.table('employees')
         console.log(err);
     });
 
-fn.table('employees')
+oasp4fn.table('employees')
     .table('departments')
     .join('department', 'id')
     .then((res: object[]) => {
@@ -57,7 +57,7 @@ fn.table('employees')
         console.log(err);
     });
 
-fn.table('departments')
+oasp4fn.table('departments')
     .reduce((result: any[], o: any) => {
         if (o.floor.length === 2)
             result.push(o);
@@ -71,7 +71,7 @@ fn.table('departments')
         console.log(err);
     });
 
-fn.table('employees')
+oasp4fn.table('employees')
     .reduce((result: any[], o: any) => {
         if (o.firstname[0] === 'P' || o.firstname[0] === 'p')
             result.push(o);
@@ -86,7 +86,7 @@ fn.table('employees')
         console.log(err);
     });
 
-fn.table('employees')
+oasp4fn.table('employees')
     .table('departments')
     .join('department', 'id')
     .where('dept_name', 'Logistic')
@@ -100,9 +100,9 @@ fn.table('employees')
     });
 
 // S3
-fn.setStorage(s3);
+oasp4fn.setStorage(s3);
 
-fn.bucket('devonfactory-odr')
+oasp4fn.bucket('devonfactory-odr')
     .then((res: string[]) => {
         console.log('\nListing the objects of the bucket devonfactory-odr');
         console.log(res);
@@ -115,13 +115,13 @@ fs.readFile('./README.md', async (err, data) => {
         console.log(err);
     else {
         try {
-            let res = await fn.upload('oasp4fn', 'README.md', data, 'text/plain').promise()
+            let res = await oasp4fn.upload('oasp4fn', 'README.md', data, 'text/plain').promise()
             console.log('\nReading a file and updloading to s3');
             console.log(res);
-            res = await fn.bucket('oasp4fn', 'README.md').promise()
+            res = await oasp4fn.bucket('oasp4fn', 'README.md').promise()
             console.log('\nGetting the object README.md from oasp4fn');
             console.log(res);
-            res = await fn.deleteObject('oasp4fn', 'README.md').promise();
+            res = await oasp4fn.deleteObject('oasp4fn', 'README.md').promise();
             console.log('\nDeleting the object README.md from oasp4fn');
             console.log(res);
         } catch (error) {
@@ -131,13 +131,13 @@ fs.readFile('./README.md', async (err, data) => {
 });
 
 // Cognito
-fn.setAuth(cognito);
+oasp4fn.setAuth(cognito);
 
 let cognitoAsyncOps = async () => {
-    let tokens = await fn.login('user', 'password', {clientId: '7i7cv6peukkugtcjvnhvmc4moe', userPoolId: 'us-west-2_1511o0vuo'}).promise()
+    let tokens = await oasp4fn.login('user', 'password', {clientId: '7i7cv6peukkugtcjvnhvmc4moe', userPoolId: 'us-west-2_1511o0vuo'}).promise()
     console.log('\nLogin with cognito');
     console.log(tokens);
-    tokens = await fn.refresh((<{RefreshToken: string}>tokens).RefreshToken, {clientId: '7i7cv6peukkugtcjvnhvmc4moe', userPoolId: 'us-west-2_1511o0vuo'}).promise();
+    tokens = await oasp4fn.refresh((<{RefreshToken: string}>tokens).RefreshToken, {clientId: '7i7cv6peukkugtcjvnhvmc4moe', userPoolId: 'us-west-2_1511o0vuo'}).promise();
     console.log('\nRefreshing tokens with cognito');
     console.log(tokens);
 }

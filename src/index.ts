@@ -1,6 +1,6 @@
 import { ElasticsearchDestinationUpdate } from 'aws-sdk/clients/firehose';
 import * as _ from 'lodash';
-import { FnDBService, FnStorageService, ServerlessConfiguration, FnAuthService } from '../dist/index';
+import { FnDBService, FnStorageService, ServerlessConfiguration, FnAuthService } from './types/index';
 let db: FnDBService;
 let storage: FnStorageService;
 let auth: FnAuthService;
