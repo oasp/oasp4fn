@@ -1,5 +1,7 @@
 src/
 test/
+.vscode/
+tslint.json
 tsconfig.json
 mocha.opts
 yarn.lock
