@@ -7,12 +7,12 @@ Oasp4fn will help you to develop your javascript cloud backend in a fast and eas
 ### DynamoDB
 
 ```javascript 
-import fn from 'oasp4fn'
-import dynamo from 'oasp4fn/out/adapters/fn-dynamo'
+import oasp4fn from '@oasp/oasp4fn';
+import dynamo from '@oasp/oasp4fn/dist/adapters/fn-dynamo';
 
-fn.setDB(dynamo, {endpoint: "https://dynamodb.us-west-2.amazonaws.com"})
+oasp4fn.setDB(dynamo, {endpoint: "https://dynamodb.us-west-2.amazonaws.com"});
 
-fn.table('employees')
+oasp4fn.table('employees')
     .table('departments')
     .join('department', 'id')
     .where('dept_name', 'Logistic')
@@ -23,24 +23,42 @@ fn.table('employees')
         console.log(res)
     }, (err: Error) => {
         console.log(err)
-})
+});
 
 ```
 
 ### S3
     
 ```javascript  
-import fn from 'oasp4fn'
-import s3 from 'oasp4fn/out/adapters/fn-s3'
+import oasp4fn from '@oasp/oasp4fn';
+import s3 from '@oasp/oasp4fn/dist/adapters/fn-s3';
 
-fn.setStorage(s3)
+oasp4fn.setStorage(s3);
 
-fn.bucket('devonfactory-odr')
+oasp4fn.bucket('your-bucket-name')
     .then((res: string[]) => {
-        console.log('\nListing the objects of the bucket devonfactory-odr')
+        console.log('\nListing the objects of the bucket')
         console.log(res)
     }, (err: Error) => {
         console.log(err)
-    })
+    });
+
+```
+
+### Cognito
+
+```javascript  
+import oasp4fn from '@oasp/oasp4fn';
+import cognito from '@oasp/oasp4fn/dist/adapters/fn-cognito';
+
+oasp4fn.setAuth(cognito);
+
+oasp4fn.login('user', 'password', {clientId: 'your-client-id', userPoolId: 'your-pool-id'})
+    .then((tokens: object) => {
+        console.log('\nLogin with cognito');
+        console.log(tokens);
+    }, (err: Error) => {
+        console.log(err)
+    });
 
 ```
