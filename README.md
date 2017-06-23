@@ -19,10 +19,10 @@ oasp4fn.table('employees')
     .project('firstname', 'surname')
     .orderBy('firstname')
     .then((res: object[]) => {
-        console.log('\nFind the name and surname of the employees in the logistic department, ordered ascendingly by the name')
-        console.log(res)
+        console.log('\nFind the name and surname of the employees in the logistic department, ordered ascendingly by the name');
+        console.log(res);
     }, (err: Error) => {
-        console.log(err)
+        console.log(err);
 });
 
 ```
@@ -37,10 +37,10 @@ oasp4fn.setStorage(s3);
 
 oasp4fn.bucket('your-bucket-name')
     .then((res: string[]) => {
-        console.log('\nListing the objects of the bucket')
-        console.log(res)
+        console.log('\nListing the objects of the bucket');
+        console.log(res);
     }, (err: Error) => {
-        console.log(err)
+        console.log(err);
     });
 
 ```
@@ -58,7 +58,7 @@ oasp4fn.login('user', 'password', {clientId: 'your-client-id', userPoolId: 'your
         console.log('\nLogin with cognito');
         console.log(tokens);
     }, (err: Error) => {
-        console.log(err)
+        console.log(err);
     });
 
 ```
