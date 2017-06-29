@@ -1,7 +1,7 @@
 {
   "name": "@oasp/oasp4fn",
   "description": "The Open Application Standard Platform for node.js and serverless",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "author": {
     "name": "Capgemini",
     "url": "https://www.capgemini.com/"
