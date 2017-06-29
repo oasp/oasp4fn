@@ -27,7 +27,6 @@ const DEFAULTS = {
 
 const WEBPACK =
 `var path = require('path');
-var nodeExternals = require('webpack-node-externals');
 
 module.exports = {
     target: 'node',
@@ -45,7 +44,6 @@ module.exports = {
         path: path.join(__dirname, '.webpack'),
         filename: '[name].js'
     },
-    externals: [ nodeExternals() ],
     entry: {
 `;
 
@@ -138,7 +136,7 @@ let generateYaml = (obj: any) => {
 let generateWebpack = (files: any) => {
     let out = _.reduceRight(files, (accumulator: string, file: string) => {
         let str = _.replace(file, /\\/g, '/');
-        return `${accumulator}\t\t'${_.trimEnd(`/${str}`, '.ts')}': './${str}',\n`;
+        return `${accumulator}\t\t'${_.replace(str, /.ts$/, '')}': './${str}',\n`;
     }, WEBPACK);
     out = `${out}\t}\n};`;
     fs.writeFile('webpack.config.js', out, (err) => {
