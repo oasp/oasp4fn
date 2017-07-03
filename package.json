@@ -21,7 +21,8 @@
     "test": "mocha --opts mocha.opts",
     "test:auto": "mocha --opts mocha.opts --watch",
     "prepublish": "npm run build && cpx src/types/**/* dist",
-    "release": "np"
+    "release": "np",
+    "doc": "typedoc --out ./doc --mode modules --excludeExternals --includeDeclarations --tsconfig tsconfig.doc.json"
   },
   "keywords": [
     "cloud",

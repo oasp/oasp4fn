@@ -37,7 +37,7 @@ interface QueryStarters {
      */
     setAuth(auth_service: FnAuthService, options?: object): void
     /**
-     * Function that use the getItems or getItems functionalities to get items of a table with the given name
+     * Function that use the getItem or getItems functionalities to get items of a table with the given name
      * 
      * @param {string} name 
      * @param {(string | string[])} [ids] 
@@ -123,8 +123,14 @@ interface QueryStarters {
 }
 
 declare class Oasp4Fn {
-    
+    /**
+     * Property that will store the solution and partial solution of the query as a promise.
+     * This property will be used in the class methods as an input and mutate it in the result of the method.
+     */
     private solution: Array<Promise<object[] | object | string | string[] | number | never>>;
+    /**
+     * Property that will store the names of the table or the bucket to use later in the query.
+     */
     private names: {tableName?: string, bucketName?: string};
     /**
      * Creates an instance of Oasp4Fn.
@@ -135,7 +141,11 @@ declare class Oasp4Fn {
      */
     constructor(solution: Promise<object[] | object | string | string[] | number | never>, names?: {tableName?: string, bucketName?: string});
     /**
-     * Function that use the getItems or getItems functionalities to get items of a table with the given name
+     * Function that use the {@link getItem} or {@link getItems} functionalities to get items of a table with the given name.
+     * 
+     * {@link solution} input: any.
+     * 
+     * {@link solution} result: object | object[] | undefined.
      * 
      * @param {string} name 
      * @param {(string | string[])} [ids] 
@@ -147,6 +157,10 @@ declare class Oasp4Fn {
     /**
      * Function that filter a table
      * 
+     * {@link solution} input: object[].
+     * 
+     * {@link solution} result: object[].
+     * 
      * @param {string} attribute 
      * @param {(string | number | boolean)} [value] 
      * @param {string} [comparator] 
@@ -156,9 +170,12 @@ declare class Oasp4Fn {
      */
     where(attribute: string, value?: string | number | boolean, comparator?: string): Oasp4Fn
     /**
-     * Function that order the elements of a table
+     * Function that orders the elements of a table. This method is based in the {@link https://lodash.com/docs/4.17.4#orderBy lodash orderBy}
      * 
-     * @param {(_.Many<string | _.ListIterator<object, any>>)} attribute 
+     * {@link solution} input: Array | object.
+     * 
+     * {@link solution} result: Array.
+     * 
      * @param {(string | string[])} [order] 
      * @returns {Oasp4Fn} 
      * 
@@ -166,7 +183,11 @@ declare class Oasp4Fn {
      */
     orderBy(attribute: _.Many<string | _.ListIterator<object, any>>, order?: string | string[]): Oasp4Fn
     /**
-     * Function that returns the first object of a table, or the number of elements specified by quantity if it’s defined
+     * Function that returns the first object of a table, or the number of elements specified by quantity if it’s defined. 
+     * 
+     * {@link solution} input: object[].
+     * 
+     * {@link solution} result: object[].
      * 
      * @param {number} [quantity] 
      * @returns {Oasp4Fn} 
@@ -177,6 +198,10 @@ declare class Oasp4Fn {
     /**
      * Function that returns the first object of a table, or the number of elements specified by quantity if it’s defined
      * 
+     * {@link solution} input: object[].
+     * 
+     * {@link solution} result: number.
+     * 
      * @returns {Oasp4Fn} 
      * 
      * @memberOf Oasp4Fn
@@ -185,6 +210,10 @@ declare class Oasp4Fn {
     /**
      * Function that return the elements of a table projecting only the specified attributes
      * 
+     * {@link solution} input: object[].
+     * 
+     * {@link solution} result: object[].
+     * 
      * @param {string[]} attributes 
      * @returns {Oasp4Fn} 
      * 
@@ -192,7 +221,11 @@ declare class Oasp4Fn {
      */
     project(attributes: string[] | string): Oasp4Fn
     /**
-     * Function that iterates over the elements of an Array applying the changes specified by iteratee
+     * Function that iterates over the elements of a collection applying the changes specified by iteratee. The iteratee is invoked with three arguments: (value, index|key, collection). This method is based in the {@link https://lodash.com/docs/4.17.4#map lodash map}
+     * 
+     * {@link solution} input: object | object[].
+     * 
+     * {@link solution} result: object[].
      * 
      * @param {ObjectIterator<object, any>} iteratee 
      * @returns {Oasp4Fn} 
@@ -201,7 +234,11 @@ declare class Oasp4Fn {
      */
     map(iteratee: ObjectIterator<object, any>): Oasp4Fn
     /**
-     * Function that filters the elements of an Array, returning a new Array with the elements in which iteratee returns true
+     * Function that filters the elements of a collection, returning a new Array with the elements in which iteratee returns true. The iteratee is invoked with three arguments: (value, index|key, collection). This method is based in the {@link https://lodash.com/docs/4.17.4#filter lodash filter}
+     * 
+     * {@link solution} input: object | object[].
+     * 
+     * {@link solution} result: object[].
      * 
      * @param {object} iteratee 
      * @returns {Oasp4Fn} 
@@ -210,7 +247,11 @@ declare class Oasp4Fn {
      */
     filter(iteratee: object): Oasp4Fn
     /**
-     * Function that iterates over the elements of a table applying the changes specified by iteratee, and accumulating the result in the accumulator. This operation is useful to calculate operations like SUM or MAX
+     * Function that iterates over the elements of a table applying the changes specified by iteratee, and accumulating the result in the accumulator. This operation is useful to calculate operations like SUM or MAX. The iteratee is invoked with four arguments: (accumulator, value, index|key, collection). This method is based in the {@link https://lodash.com/docs/4.17.4#reduceRight lodash reduceRight}
+     * 
+     * {@link solution} input: object | object[].
+     * 
+     * {@link solution} result: any.
      * 
      * @param {MemoIterator<object, object>} iteratee 
      * @param {(any[] | object | number)} [accumulator] 
@@ -219,9 +260,12 @@ declare class Oasp4Fn {
      * @memberOf Oasp4Fn
      */
     reduce(iteratee: MemoIterator<object, object>, accumulator?: any[] | object | number ): Oasp4Fn
-    
     /**
-     * Function that perform an inner join of two tables
+     * Function that perform an inner join of two tables. This function is based in {@link https://github.com/mtraynham/lodash-joins join operation} of Matt Traynham
+     * 
+     * {@link solution} input: object[]. (In this case solution must have at least 2 tables)
+     * 
+     * {@link solution} result: object[].
      * 
      * @param {string} accessor0 
      * @param {string} accessor1 
@@ -232,6 +276,10 @@ declare class Oasp4Fn {
     join(accessor0: string, accessor1: string): Oasp4Fn
     /**
      * Function to insert the modified items in a table
+     * 
+     * {@link solution} input: object | object[].
+     * 
+     * {@link solution} result: string | string[]. 
      * 
      * @returns {Oasp4Fn} 
      * 
@@ -258,12 +306,12 @@ declare class Oasp4Fn {
      * A then override following the promise/A+ open standard requirements
      * 
      * @param {(Function | null)} result 
-     * @param {(Function | null)} reject 
+     * @param {Function} reject 
      * @returns {(Promise<object[] | object | string | number>)} 
      * 
      * @memberOf Oasp4Fn
      */
-    then(result?: Function, reject?: Function): Promise<object[] | object | string | number>
+    then(result: Function | null, reject?: Function): Promise<object[] | object | string | number>
     /**
      * This function return the solution as a promise
      * 
@@ -278,28 +326,153 @@ declare let fn: QueryStarters
 export default fn
 
 export interface FnDBService {
-    instance: (options?: Object) => void;
-    getItem: (table_name: string, id: string) => Promise<Object | Error>;
-    getItems: (table_name: string, ids?: Array<string>) => Promise<Array<Object> | Error>;
-    putItem: (table_name: string, item: Object) => Promise<string | Error>;
-    putItems: (table_name: string, items: Array<Object>) => Promise<Array<any> | Error>;
-    deleteItem: (table_name: string, id: string) => Promise<Object | Error>;
-    deleteItems: (table_name: string, ids: Array<string>) => Promise<Array<string> | Error>;
+    /**
+     * Creates an instance of the service with the given options.
+     * 
+     * @param {Object} [options] 
+     * @memberof FnDBService
+     */
+    instance(options?: Object): void;
+    /**
+     * Return the item specified by id, else undefined.
+     * 
+     * @param {string} table_name 
+     * @param {string} id 
+     * @returns {(Promise<Object | Error>)} 
+     * @memberof FnDBService
+     */
+    getItem(table_name: string, id: string): Promise<Object | Error>;
+    /**
+     * Return an array of items specifieds by ids, but if none is passed the full table is returned.
+     * 
+     * @param {string} table_name 
+     * @param {string[]} [ids] 
+     * @returns {(Promise<object[]| Error>)} 
+     * @memberof FnDBService
+     */
+    getItems(table_name: string, ids?: string[]): Promise<object[] | Error>;
+    /**
+     * Insert an item of the table.
+     * 
+     * @param {string} table_name 
+     * @param {Object} item 
+     * @returns {(Promise<string | Error>)} 
+     * @memberof FnDBService
+     */
+    putItem(table_name: string, item: Object): Promise<string | Error>;
+    /**
+     * Insert a list of items in the table.
+     * 
+     * @param {string} table_name 
+     * @param {Object[]} items 
+     * @returns {(Promise<any[] | Error>)} 
+     * @memberof FnDBService
+     */
+    putItems(table_name: string, items: Object[]): Promise<any[] | Error>;
+    /**
+     * Delete an item of the table, with a given id.
+     * 
+     * @param {string} table_name 
+     * @param {string} id 
+     * @returns {(Promise<object | Error>)} 
+     * @memberof FnDBService
+     */
+    deleteItem(table_name: string, id: string): Promise<object | Error>;
+    /**
+     * Delete various items in the table, specifieds by an array of ids.
+     * 
+     * @param {string} table_name 
+     * @param {string[]} ids 
+     * @returns {(Promise<string[] | Error>)} 
+     * @memberof FnDBService
+     */
+    deleteItems(table_name: string, ids: string[]): Promise<string[] | Error>;
 }
 
 export interface FnStorageService {
-    instance: (options?: Object) => void;
-    getObject: (bucket: string, id: string) => Promise<Buffer | Error>;
-    listObjects: (bucket: string) => Promise<Array<string> | Error>;
-    putObject: (bucket: string, id: string, buffer: Buffer, mimetype?: string, access?: string) => Promise<string | Error>;
-    deleteObject: (bucket: string, id: string) => Promise<string | Error>;
-    deleteObjects: (bucket: string, ids: Array<string>) => Promise<Array<string> | Error>
+    /**
+     * Creates an instance of the service with the given options.
+     * 
+     * @param {Object} [options] 
+     * @memberof FnStorageService
+     */
+    instance(options?: Object): void;
+    /**
+     * Get an object from a bucket as a binary buffer
+     * 
+     * @param {string} bucket 
+     * @param {string} id 
+     * @returns {(Promise<Buffer | Error>)} 
+     * @memberof FnStorageService
+     */
+    getObject(bucket: string, id: string): Promise<Buffer | Error>;
+    /**
+     * Lists the objects of a bucket.
+     * 
+     * @param {string} bucket 
+     * @returns {(Promise<string[] | Error>)} 
+     * @memberof FnStorageService
+     */
+    listObjects(bucket: string): Promise<string[] | Error>;
+    /**
+     * Insert an object into a bucket
+     * 
+     * @param {string} bucket 
+     * @param {string} id 
+     * @param {Buffer} buffer 
+     * @param {string} [mimetype] 
+     * @param {string} [access] 
+     * @returns {(Promise<string | Error>)} 
+     * @memberof FnStorageService
+     */
+    putObject(bucket: string, id: string, buffer: Buffer, mimetype?: string, access?: string): Promise<string | Error>;
+    /**
+     * Delete an object form a bucket, with a given id.
+     * 
+     * @param {string} bucket 
+     * @param {string} id 
+     * @returns {(Promise<string | Error>)} 
+     * @memberof FnStorageService
+     */
+    deleteObject(bucket: string, id: string): Promise<string | Error>;
+    /**
+     * Delete a list of objects from a bucket, specifieds by an array of ids.
+     * 
+     * @param {string} bucket 
+     * @param {string[]} ids 
+     * @returns {(Promise<string[] | Error>)} 
+     * @memberof FnStorageService
+     */
+    deleteObjects(bucket: string, ids: string[]): Promise<string[] | Error>
 }
 
 export interface FnAuthService {
-    instance: (options?: Object) => void;
-    authenticateUser: (user: string, password: string, pool: string | object) => Promise<object | string | Error>;
-    refreshToken: (refresh_token: string, pool: string | object) => Promise<object | string | Error>;
+    /**
+     * Creates an instance of the service with the given options.
+     * 
+     * @param {Object} [options] 
+     * @memberof FnAuthService
+     */
+    instance(options?: Object): void;
+    /**
+     * Authenticate an user and return a token or tokens if the operation is succesful.
+     * 
+     * @param {string} user 
+     * @param {string} password 
+     * @param {(string | object)} pool 
+     * @returns {(Promise<object | string | Error>)} 
+     * @memberof FnAuthService
+     */
+    authenticateUser(user: string, password: string, pool: string | object): Promise<object | string | Error>;
+    /**
+     * Refresh the tokens given by @see authenticateUser
+     * 
+     * @param {string} refresh_token 
+     * @param {(string | object)} pool 
+     * @returns {(Promise<object | string | Error>)} 
+     * @memberof FnAuthService
+     */
+    refreshToken(refresh_token: string, pool: string | object): Promise<object | string | Error>;
 }
 
 export interface ServerlessConfiguration {
