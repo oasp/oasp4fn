@@ -3,6 +3,7 @@ test/
 .vscode/
 tslint.json
 tsconfig.json
+tsconfig.doc.json
 mocha.opts
 yarn.lock
 dist/**/*.js.map
