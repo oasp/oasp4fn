@@ -37,7 +37,9 @@ interface QueryStarters {
      */
     setAuth(auth_service: FnAuthService, options?: object): void
     /**
-     * Function that use the getItem or getItems functionalities to get items of a table with the given name
+     * Function that use the {@link getItem} or {@link getItems} functionalities to get items of a table with the given name
+     * 
+     * {@link solution} result: object | object[] | undefined. 
      * 
      * @param {string} name 
      * @param {(string | string[])} [ids] 
@@ -49,6 +51,8 @@ interface QueryStarters {
     /**
      * Function to insert new items in a table
      * 
+     * {@link solution} result: string | string[].
+     * 
      * @param {string} table_name 
      * @param {(Object | object[])} items 
      * @returns {Oasp4Fn} 
@@ -58,6 +62,8 @@ interface QueryStarters {
     insert(table_name: string, items: Object | object[]): Oasp4Fn
     /**
      * Function to delete one or more items in a table
+     * 
+     * {@link solution} result: string | string[]. 
      * 
      * @param {string} table_name 
      * @param {(string | string[])} ids 
@@ -69,6 +75,8 @@ interface QueryStarters {
     /**
      * Function that list the elements of a bucket or download one if an identifier is passed
      * 
+     * {@link solution} result: Buffer | string[]. 
+     * 
      * @param {string} bucket_name 
      * @param {string} [id] 
      * @returns {Oasp4Fn} 
@@ -77,7 +85,10 @@ interface QueryStarters {
      */
     bucket(bucket_name: string, id?: string): Oasp4Fn
     /**
-     * Function that upload an object to a bucket
+     * Function that upload an object to a bucket, the result of the operation will be the location
+     *  url.
+     * 
+     * {@link solution} result: string. 
      * 
      * @param {string} bucket_name 
      * @param {string} id 
@@ -92,6 +103,8 @@ interface QueryStarters {
     /**
      * Function to delete one or more objects in a bucket
      * 
+     * {@link solution} result: string | string[].
+     * 
      * @param {string} bucket_name 
      * @param {(string | string[])} ids 
      * @returns {Oasp4Fn} 
@@ -101,6 +114,8 @@ interface QueryStarters {
     deleteObject(bucket_name: string, ids: string | string[]): Oasp4Fn
     /**
      * Function that performs a login into an application
+     * 
+     * {@link solution} result: string | object.
      * 
      * @param {string} user 
      * @param {string} password 
@@ -112,6 +127,8 @@ interface QueryStarters {
     login(user: string, password: string, pool: string | object): Oasp4Fn
     /**
      * Function that refresh the token/s of a logged user
+     * 
+     * {@link solution} result: string | object. 
      * 
      * @param {string} refresh_token 
      * @param {(string | object)} pool 
@@ -275,7 +292,7 @@ declare class Oasp4Fn {
      */
     join(accessor0: string, accessor1: string): Oasp4Fn
     /**
-     * Function to insert the modified items in a table
+     * Function to insert the modified item or items in a table
      * 
      * {@link solution} input: object | object[].
      * 
@@ -289,6 +306,10 @@ declare class Oasp4Fn {
     /**
      * Function to delete the extracted items in the query
      * 
+     * {@link solution} input: object | object[].
+     * 
+     * {@link solution} result: string | string[]. 
+     * 
      * @returns {Oasp4Fn} 
      * 
      * @memberof Oasp4Fn
@@ -297,13 +318,21 @@ declare class Oasp4Fn {
     /**
      * Function to delete objects specifieds in the query
      * 
+     * {@link solution} input: string | string[].
+     * 
+     * {@link solution} result: string | string[]. 
+     * 
      * @returns {Oasp4Fn} 
      * 
      * @memberof Oasp4Fn
      */
     deleteObject(): Oasp4Fn
     /**
-     * A then override following the promise/A+ open standard requirements
+     * A then override following the promise/A+ open standard requirements.
+     * 
+     * {@link solution} input: any.
+     * 
+     * {@link solution} result: Promise. 
      * 
      * @param {(Function | null)} result 
      * @param {Function} reject 
@@ -314,6 +343,10 @@ declare class Oasp4Fn {
     then(result: Function | null, reject?: Function): Promise<object[] | object | string | number>
     /**
      * This function return the solution as a promise
+     * 
+     * {@link solution} input: any.
+     * 
+     * {@link solution} result: Promise. 
      * 
      * @returns {Promise<object[] | object | string | number>} 
      * 
