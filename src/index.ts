@@ -336,7 +336,7 @@ class Oasp4Fn {
 
         return this;
     }
-    then(result?: Function, reject?: Function) {
+    then(result: Function | null, reject?: Function) {
         let promise: Promise<object[] | object | string | number> = this.solution[0];
         if (result && reject) {
             promise = this.solution[0]
