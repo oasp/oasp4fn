@@ -4,9 +4,11 @@ import fn from '../src/index';
 import s3 from '../src/adapters/fn-s3';
 import * as AWS from 'aws-sdk';
 
-let aws_s3 = new AWS.S3();
+let endpoint = process.env.ENDPOINT || 'http://localhost:4572/';
+let region = process.env.DEFAULT_REGION || 'us-east-1';
+let aws_s3 = new AWS.S3({ endpoint: endpoint, region: region, s3ForcePathStyle: true });
 
-fn.setStorage(s3);
+fn.setStorage(s3, { endpoint: endpoint, region: region, s3ForcePathStyle: true });
 
 before(async function () {
     let create: Promise<void | AWS.S3.CreateBucketOutput>;
@@ -21,7 +23,7 @@ before(async function () {
                 Bucket: 'oasp4fn',
                 ACL: 'public-read-write',
                 CreateBucketConfiguration: {
-                    LocationConstraint: 'us-west-2'
+                    LocationConstraint: region
                 }
             };
             create = aws_s3.createBucket(params).promise();
@@ -30,225 +32,98 @@ before(async function () {
             return Promise.reject(err);
     }
 
-    try {
-        await create;
-    } catch (err) {
-        return Promise.reject(err);
-    }
+    await create;
 });
 
 describe('upload', function () {
     this.timeout(0);
+
      it('The function should return a reference to the self object', () => {
          expect(fn.upload('oasp4fn', 'test.txt', new Buffer('someBuffer'))).to.be.an('object');
      });
-     it('If the upload is succesfull, the resolution should be the location of the object', (done: Function) => {
-        fn.upload('oasp4fn', 'test.txt', new Buffer('test'))
-            .then((res: string) => {
-            try {
-                expect(res).to.be.a('string');
-                done();
-            }
-            catch (err) {
-                done(err);
-            }
-         }, (err: Error) => {
-             try {
-                expect(err).to.be.undefined;
-                done();
-             }
-             catch (err) {
-                done(err);
-             }
-         });
+
+     it('If the upload is succesfull, the resolution should be the location of the object', async () => {
+        const res = await fn.upload('oasp4fn', 'test.txt', new Buffer('test')).promise();
+        expect(res).to.be.a('string');
      });
-     it('If the bucket doesn\'t exist, the resolution promise should return an Error', (done: Function) => {
-         fn.upload('some_bucket', 'test.txt', new Buffer('test'))
-             .then((res: string) => {
-            try {
+
+     it('If the bucket doesn\'t exist, the resolution promise should return an Error',  () => {
+        return fn.upload('some_bucket', 'test.txt', new Buffer('test'))
+            .then((res: string) => {
                 expect(res).to.be.undefined;
-                done();
-             }
-             catch (err) {
-                 done(err);
-             }
             }, (err: Error) => {
-             try {
                 expect(err).to.not.be.null;
-                done();
-             }
-             catch (err) {
-                 done(err);
-             }
          });
      });
 });
 
 describe('bucket', function () {
      this.timeout(0);
+
      it('The function should return a reference to the self object', () => {
          expect(fn.bucket('oasp4fn')).to.be.an('object');
      });
-     it('If the operation is succesfull, the resolution should be an array with the keys of the objects in the bucket', (done: Function) => {
-        fn.bucket('oasp4fn')
+
+     it('If the operation is succesfull, the resolution should be an array with the keys of the objects in the bucket', async () => {
+        const res = await fn.bucket('oasp4fn').promise();
+        expect(res).to.be.a('array');
+        expect(res).to.include('test.txt');
+     });
+
+     it('If an object key is especified, the function should return the especified object, as binary data', async () => {
+        const res = await fn.bucket('oasp4fn', 'test.txt').promise();
+        expect(Buffer.isBuffer(res)).to.be.true;
+     });
+
+     it('If the bucket doesn\'t exist, the resolution promise should return an Error', () => {
+        return fn.bucket('some_bucket')
             .then((res: string[]) => {
-            try {
-                expect(res).to.be.a('array');
-                expect(res).to.include('test.txt');
-                done();
-            }
-            catch (err) {
-                done(err);
-            }
-         }, (err: Error) => {
-             try {
-                expect(err).to.be.undefined;
-                done();
-             }
-             catch (err) {
-                done(err);
-             }
-         });
-     });
-     it('If an object key is especified, the function should return the especified object, as binary data', (done: Function) => {
-        fn.bucket('oasp4fn', 'test.txt')
-            .then((res: Buffer) => {
-            try {
-                expect(Buffer.isBuffer(res)).to.be.true;
-                done();
-            }
-            catch (err) {
-                done(err);
-            }
-         }, (err: Error) => {
-             try {
-                expect(err).to.be.undefined;
-                done();
-             }
-             catch (err) {
-                done(err);
-             }
-         });
-     });
-     it('If the bucket doesn\'t exist, the resolution promise should return an Error', (done: Function) => {
-         fn.bucket('some_bucket').then((res: string[]) => {
-            try {
                 expect(res).to.be.undefined;
-                done();
-             }
-             catch (err) {
-                 done(err);
-             }
             }, (err: Error) => {
-             try {
                 expect(err).to.not.be.null;
-                done();
-             }
-             catch (err) {
-                 done(err);
-             }
          });
      });
 });
 
 describe('deleteObject', function () {
     this.timeout(0);
-     before((done: Function) => {
+
+     before(() => {
         let promises: Promise<object>[] = [];
         promises.push(<Promise<object>>fn.upload('oasp4fn', 'test1.txt', new Buffer('test')).promise());
         promises.push(<Promise<object>>fn.upload('oasp4fn', 'test2.txt', new Buffer('test')).promise());
         promises.push(<Promise<object>>fn.upload('oasp4fn', 'test3.txt', new Buffer('test')).promise());
         promises.push(<Promise<object>>fn.upload('oasp4fn', 'test4.txt', new Buffer('test')).promise());
         promises.push(<Promise<object>>fn.upload('oasp4fn', 'test5.txt', new Buffer('test')).promise());
-        Promise.all(promises)
-            .then((res: any) => {
-                done();
-            }, (err: Error) => {
-                done(err);
-            });
+        return Promise.all(promises)
      });
+
      it('The function should return a reference to the self object', () => {
          expect(fn.deleteObject('oasp4fn', 'test1.txt')).to.be.an('object');
      });
-     it('If the operation is succesfull, the resolution should be the key or keys of deleted object/s', (done: Function) => {
-        fn.deleteObject('oasp4fn', 'test.txt')
-            .then((res: string) => {
-            try {
-                expect(res).to.be.a('string');
-                expect(res).to.be.equal('test.txt');
-            }
-            catch (err) {
-                done(err);
-            }
-         }, (err: Error) => {
-             try {
-                expect(err).to.be.undefined;
-             }
-             catch (err) {
-                done(err);
-             }
-         });
-         fn.deleteObject('oasp4fn', ['test2.txt', 'test3.txt'])
-            .then((res: string[]) => {
-            try {
-                expect(res).to.be.an('array');
-                expect(res).to.have.lengthOf(2);
-                expect(res).to.have.members(['test2.txt', 'test3.txt']);
-                done();
-            }
-            catch (err) {
-                done(err);
-            }
-         }, (err: Error) => {
-             try {
-                expect(err).to.be.undefined;
-                done();
-             }
-             catch (err) {
-                done(err);
-             }
-         });
-     });
-     it('If the operation is not starter, the operation delete the objects on which we are operating', (done: Function) => {
 
-         fn.bucket('oasp4fn')
-            .deleteObject()
-            .then((res: string[]) => {
-            try {
-                expect(res).to.be.an('array');
-                done();
-            }
-            catch (err) {
-                done(err);
-            }
-         }, (err: Error) => {
-             try {
-                expect(err).to.be.undefined;
-                done();
-             }
-             catch (err) {
-                done(err);
-             }
-         });
+     it('If the operation is succesfull, the resolution should be the key or keys of deleted object/s', async () => {
+        const resObject = await fn.deleteObject('oasp4fn', 'test.txt').promise();
+        expect(resObject).to.be.a('string');
+        expect(resObject).to.be.equal('test.txt');
+
+        const resArray = await fn.deleteObject('oasp4fn', ['test2.txt', 'test3.txt']).promise();
+        expect(resArray).to.be.an('array');
+        expect(resArray).to.have.lengthOf(2);
+        expect(resArray).to.have.members(['test2.txt', 'test3.txt']);
      });
-     it('If the bucket doesn\'t exist, the resolution promise should return an Error', (done: Function) => {
-         fn.deleteObject('some_bucket', 'test')
+
+     it('If the operation is not starter, the operation delete the objects on which we are operating', async () => {
+        const res = await fn.bucket('oasp4fn').deleteObject().promise();
+        expect(res).to.be.an('array');
+     });
+
+     it('If the bucket doesn\'t exist, the resolution promise should return an Error', () => {
+        return fn.deleteObject('some_bucket', 'test')
              .then((res: string) => {
-            try {
                 expect(res).to.be.undefined;
-                done();
-             }
-             catch (err) {
-                 done(err);
-             }
             }, (err: Error) => {
-             try {
                 expect(err).to.not.be.null;
-                done();
-             }
-             catch (err) {
-                 done(err);
-             }
          });
      });
 });

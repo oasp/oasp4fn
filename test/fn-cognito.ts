@@ -12,7 +12,7 @@ fn.setAuth(cognito);
 
 before(async function () {
     let create: Promise<AWS.CognitoIdentityServiceProvider.CreateUserPoolClientResponse | AWS.CognitoIdentityServiceProvider.AdminCreateUserResponse>[] = [];
-    this.timeout(0);
+    this.skip();
 
     try {
         let res = await aws_cognito.createUserPool({ PoolName: 'oasp4fn'}).promise();
@@ -26,7 +26,7 @@ before(async function () {
     }
 });
 
-describe('login', function () {
+describe.skip('login', function () {
     this.timeout(0);
     it('The function should return a reference to the self object', (done: Function) => {
          try {
@@ -90,7 +90,7 @@ describe('login', function () {
         });
 });
 
-describe('refresh', function () {
+describe.skip('refresh', function () {
     this.timeout(0);
     let refresh_token: string;
     before((done: Function) => {
@@ -142,10 +142,10 @@ describe('refresh', function () {
     });
 });
 
-after(async () => {
-    try {
-        await aws_cognito.deleteUserPool({ UserPoolId: pool.userPoolId}).promise();
-    }catch (err) {
-        return Promise.reject(err);
-    }
-});
+// after(async () => {
+//     try {
+//         await aws_cognito.deleteUserPool({ UserPoolId: pool.userPoolId}).promise();
+//     }catch (err) {
+//         return Promise.reject(err);
+//     }
+// });

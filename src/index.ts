@@ -4,8 +4,8 @@ import { FnDBService, FnStorageService, ServerlessConfiguration, FnAuthService }
 let db: FnDBService;
 let storage: FnStorageService;
 let auth: FnAuthService;
-
 type PromiseResponse = string | number | object | string[] | object[];
+
 export default {
     config: function (configuration: ServerlessConfiguration) {},
     setDB: function (db_service: FnDBService, options?: object) {
