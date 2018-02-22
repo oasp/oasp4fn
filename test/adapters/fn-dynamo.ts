@@ -1,7 +1,7 @@
 
 import { expect } from 'chai';
-import fn from '../src/index';
-import dynamo from '../src/adapters/fn-dynamo';
+import fn from '../../src/index';
+import dynamo from '../../src/adapters/fn-dynamo';
 let DynamoDB = require('aws-sdk/clients/dynamodb');
 
 let endpoint = process.env.ENDPOINT || 'http://localhost:4569/';
@@ -133,6 +133,7 @@ describe('table', () => {
         expect(res).to.be.an('array');
         expect(res).to.have.lengthOf(3);
      });
+
      it('If an id passed doesn\'t have an item in the table, an error will be returned', () => {
         return fn.table('departments', '7')
              .then((res: Department) => {
@@ -200,28 +201,30 @@ describe('orderBy', () => {
      });
 
      it("If you pass more than one attribute, the result array should be sorted having in mind all the atributtes", async () => {
-        const res1 = <Employee[]>await fn.table('employees')
+        const res = <Employee[]>await fn.table('employees')
                                          .orderBy(['department', 'id'], 'desc')
                                          .promise();
-        expect(res1).to.be.an('array');
-        expect(res1).to.have.lengthOf(4);
-        let i = res1.length;
+        expect(res).to.be.an('array');
+        expect(res).to.have.lengthOf(4);
+        let i = res.length;
         while (--i) {
-            expect(res1[i].department <= res1[i - 1].department).to.be.true;
-            if (res1[i].department === res1[i - 1].department)
-                expect(res1[i].id <= res1[i - 1].id).to.be.true;
+            expect(res[i].department <= res[i - 1].department).to.be.true;
+            if (res[i].department === res[i - 1].department)
+                expect(res[i].id <= res[i - 1].id).to.be.true;
         }
-        
-        const res2 = <Employee[]>await fn.table('employees')
+     });
+
+     it("If you pass more than one attribute and more than one order, the result array should be sorted having in mind all the atributtes and all orders", async () => {  
+        const res = <Employee[]>await fn.table('employees')
                                          .orderBy(['department', 'id'], ['desc', 'asc'])
                                          .promise();
-        expect(res2).to.be.an('array');
-        expect(res2).to.have.lengthOf(4);
-        let j = res2.length;
+        expect(res).to.be.an('array');
+        expect(res).to.have.lengthOf(4);
+        let j = res.length;
         while (--j) {
-            expect(res2[j].department <= res2[j - 1].department).to.be.true;
-            if (res2[j].department === res2[j - 1].department)
-                expect(res2[j].id >= res2[j - 1].id).to.be.true;
+            expect(res[j].department <= res[j - 1].department).to.be.true;
+            if (res[j].department === res[j - 1].department)
+                expect(res[j].id >= res[j - 1].id).to.be.true;
         }
      });
 
@@ -538,15 +541,17 @@ describe('insert', () => {
          expect(fn.insert('departments', [{id: '7', name: 'Sales'}, {id: '5', name: 'Comercial'}])).to.be.an('object');
      });
 
-     it('If the operation is succesful, the result is an id or an array of ids', async () => {
-        const resArray = await fn.insert('departments', [{ id: '7', name: 'Sales' }, { id: '5', name: 'Comercial' }])
+     it('If the operation is performed over an array of items, the result is an array of ids', async () => {
+        const res = await fn.insert('departments', [{ id: '7', name: 'Sales' }, { id: '5', name: 'Comercial' }])
                                  .promise();
-        expect(resArray).to.be.an('array');
-        expect(resArray).to.have.lengthOf(2);
-        
-        const resObject = await fn.insert('departments', { id: '8', name: 'Sales' })
+        expect(res).to.be.an('array');
+        expect(res).to.have.lengthOf(2);
+     });
+
+     it('If the operation is performed over a single object, the result is an id', async () => {
+        const res = await fn.insert('departments', { id: '8', name: 'Sales' })
                                   .promise();
-        expect(resObject).to.be.a('string').equal('8');
+        expect(res).to.be.a('string').equal('8');
      });
 
      it('If the operation is not starter, the operation insert the items on which we are operating', async () => {
@@ -561,16 +566,18 @@ describe('insert', () => {
         expect(res).to.have.lengthOf(7);
      });
      
-     it('If the operation it\'s done over an empty array, the result should be an empty array', async () => {
-        const res1 = await fn.insert('employees', [])
+     it('If an empty array is passed to the operation, the result should be an empty array', async () => {
+        const res = await fn.insert('employees', [])
                              .promise();
-        expect(res1).to.be.an('array').empty;
+        expect(res).to.be.an('array').empty;
+     });
 
-        const res2 = await fn.table('employees')
+     it('If the operation is done over an empty array, the result should be an empty array', async () => {
+        const res = await fn.table('employees')
                              .where('id', 'x', '=')
                              .insert()
                              .promise();
-        expect(res2).to.be.an('array').empty;
+        expect(res).to.be.an('array').empty;
      });
 
      it('If the operation fail, the resolution should be an error', () => {
@@ -589,34 +596,40 @@ describe('delete', () => {
          expect(fn.delete('employees', '1')).to.be.an('object');
      });
 
-     it('If the operation is succesful, the result is an id or an array of ids', async () => {
-        const resArray = await fn.delete('departments', ['5', '7'])
+     it('If an array is passed to the operation, the result is an array of ids', async () => {
+        const res = await fn.delete('departments', ['5', '7'])
                                  .promise();
-        expect(resArray).to.be.an('array');
-        expect(resArray).to.have.lengthOf(2);
-        expect(resArray).to.have.members(['5', '7']);
-        
-        const resObject = await fn.delete('departments', '8')
-                            .promise();
-        expect(resObject).to.be.a('string').equals('8');
+        expect(res).to.be.an('array');
+        expect(res).to.have.lengthOf(2);
+        expect(res).to.have.members(['5', '7']);
      });
 
-     it('If the operation is not starter, the operation delete the items on which we are operating', async () => {
-        const res1 = await fn.table('departments', '9')
+     it('If the operation is succesful, the result is an id', async () => {
+        const res = await fn.delete('departments', '8')
+                                  .promise();
+        expect(res).to.be.a('string').equals('8');
+     });
+
+     it('If the operation is not starter, and it\'s performed over a single element, the operation will delete that item', async () => {
+        const res = await fn.table('departments', '9')
                        .project('id')
                        .delete()
                        .promise();
-        expect(res1).to.be.an('string').equal('9');
-        
-        const res2 = await fn.table('departments', ['10', '11', '12'])
+        expect(res).to.be.an('string').equal('9');
+     });
+
+     it('If the operation is not starter, and it\'s performed over an array of elements, the operation will delete these items', async () => {
+        const res = await fn.table('departments', ['10', '11', '12'])
                        .project('id')
                        .delete()
                        .promise();
-        expect(res2).to.be.an('array');
-        expect(res2).to.have.lengthOf(3);
-        expect(res2).to.have.members(['10', '11', '12']);
-        
-        const res3 = await fn.table('departments', '13')
+        expect(res).to.be.an('array');
+        expect(res).to.have.lengthOf(3);
+        expect(res).to.have.members(['10', '11', '12']);
+     });
+
+     it('If the operation is not starter, it\'s possible to get the item to delete reducing the object which we want to delete', async () => {
+        const res = await fn.table('departments', '13')
                        .reduce((accum: string, o: string | number[], key: string) => {
                             if (key === 'id')
                                 return o;
@@ -625,9 +638,11 @@ describe('delete', () => {
                         }, '')
                         .delete()
                         .promise();
-        expect(res3).to.be.an('string').equal('13');
-            
-        const res4 = await fn.table('departments')
+        expect(res).to.be.an('string').equal('13');
+     });
+
+    it('If the operation is not starter, it\'s possible to get the items to delete reducing an array of objects', async () => {   
+        const res = await fn.table('departments')
                              .reduce((accum: string[], o: Department) => {
                                 if (Number.parseInt(o.id) > 13)
                                     accum.push(o.id)
@@ -635,21 +650,23 @@ describe('delete', () => {
                              })
                              .delete()
                              .promise();
-        expect(res4).to.be.an('array');
-        expect(res4).to.have.lengthOf(2);
-        expect(res4).to.have.members(['15', '16']);
+        expect(res).to.be.an('array');
+        expect(res).to.have.lengthOf(2);
+        expect(res).to.have.members(['15', '16']);
      });
      
-     it('If the operation it\'s done over an empty array, the result should be an empty array', async () => {
-        const res1 = await fn.delete('employees', [])
+     it('If an empty array is passed to the operation, the result should be an empty array', async () => {
+        const res = await fn.delete('employees', [])
                             .promise();
-        expect(res1).to.be.an('array').empty;
-        
-        const res2 = await fn.table('employees')
+        expect(res).to.be.an('array').empty;
+     });
+
+     it('If the operation is done over an empty array, the result should be an empty array', async () => {
+        const res = await fn.table('employees')
                              .where('id', 'x')
                              .delete()
                              .promise();
-        expect(res2).to.be.an('array').empty;
+        expect(res).to.be.an('array').empty;
      });
 
      it('If the operation is performed over an inexisten table, the resolution should be an error', () => {

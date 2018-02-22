@@ -47,7 +47,7 @@ module.exports = {
     entry: {
 `;
 
-export function run(opts: any) {
+export function run(opts?: any) {
     let options: any = opts ? defineOptions(opts) : _.assign({}, DEFAULTS.aws, { path: DEFAULTS.path });
     let dirs = fs.readdirSync(options.path);
     dirs = _.reduceRight(<any>dirs, (accumulator: any, value) => {

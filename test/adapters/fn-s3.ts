@@ -1,7 +1,7 @@
 
 import { expect } from 'chai';
-import fn from '../src/index';
-import s3 from '../src/adapters/fn-s3';
+import fn from '../../src/index';
+import s3 from '../../src/adapters/fn-s3';
 import * as AWS from 'aws-sdk';
 
 let endpoint = process.env.ENDPOINT || 'http://localhost:4572/';
@@ -102,15 +102,17 @@ describe('deleteObject', function () {
          expect(fn.deleteObject('oasp4fn', 'test1.txt')).to.be.an('object');
      });
 
-     it('If the operation is succesfull, the resolution should be the key or keys of deleted object/s', async () => {
-        const resObject = await fn.deleteObject('oasp4fn', 'test.txt').promise();
-        expect(resObject).to.be.a('string');
-        expect(resObject).to.be.equal('test.txt');
+     it('If the operation is performed over a single object key, the resolution should be the key of the deleted object', async () => {
+        const res = await fn.deleteObject('oasp4fn', 'test.txt').promise();
+        expect(res).to.be.a('string');
+        expect(res).to.be.equal('test.txt');
+     });
 
-        const resArray = await fn.deleteObject('oasp4fn', ['test2.txt', 'test3.txt']).promise();
-        expect(resArray).to.be.an('array');
-        expect(resArray).to.have.lengthOf(2);
-        expect(resArray).to.have.members(['test2.txt', 'test3.txt']);
+     it('If the operation is over an array of object keys, the resolution should be the keys of deleted objects', async () => {
+        const res = await fn.deleteObject('oasp4fn', ['test2.txt', 'test3.txt']).promise();
+        expect(res).to.be.an('array');
+        expect(res).to.have.lengthOf(2);
+        expect(res).to.have.members(['test2.txt', 'test3.txt']);
      });
 
      it('If the operation is not starter, the operation delete the objects on which we are operating', async () => {
