@@ -4,6 +4,7 @@ import { FnDBService, FnStorageService, ServerlessConfiguration, FnAuthService }
 let db: FnDBService;
 let storage: FnStorageService;
 let auth: FnAuthService;
+type PromiseResponse = string | number | object | string[] | object[];
 
 export default {
     config: function (configuration: ServerlessConfiguration) {},
@@ -99,9 +100,9 @@ export default {
 };
 
 class Oasp4Fn {
-    private solution: Array<Promise<object[] | object | string | string[] | number | never>> = [];
+    private solution: Array<Promise<PromiseResponse>> = [];
 
-    constructor (solution: Promise<object[] | object | string | string[] | number | never>, private names?: {tableName?: string, bucketName?: string}) {
+    constructor(solution: Promise<PromiseResponse>, private names?: {tableName?: string, bucketName?: string}) {
         this.solution.push(solution);
     };
 
@@ -126,7 +127,7 @@ class Oasp4Fn {
     where(attribute: string, value?: string | number | boolean, comparator?: string) {
         let _comparator = comparator || '=';
 
-        this.solution[0] = this.solution[0].then((res: object[]): any => {
+        this.solution[0] = this.solution[0].then((res: string | number | object | string[] | object[]): any => {
             if (Array.isArray(res)) {
                 if (typeof value !== 'undefined') {
                     switch (_comparator) {
@@ -172,9 +173,9 @@ class Oasp4Fn {
                 _order = _.fill(Array(attribute.length), 'asc');
         }
 
-        this.solution[0] = this.solution[0].then((res: object[]): any => {
+        this.solution[0] = this.solution[0].then((res: PromiseResponse): any => {
             if (_.isObject(res))
-                return _.orderBy(res, attribute, _order);
+                return _.orderBy(<_.NumericDictionary<object>>res, attribute, _order);
             return Promise.reject('Invalid use of orderBy operation');
         });
 
@@ -183,16 +184,16 @@ class Oasp4Fn {
     first(quantity?: number) {
         let _quantity = (quantity && quantity > 1) ? quantity : 1;
 
-        this.solution[0] = this.solution[0].then((res: object[]): any => {
+        this.solution[0] = this.solution[0].then((res: PromiseResponse): any => {
             if (Array.isArray(res))
-                return _.slice(res, 0, _quantity);
+                return _.slice(<ArrayLike<object | string>>res, 0, _quantity);
             return Promise.reject('Invalid use of first operation');
         });
 
         return this;
     }
     count() {
-        this.solution[0] = this.solution[0].then((res: object[]): any => {
+        this.solution[0] = this.solution[0].then((res: PromiseResponse): any => {
             if (Array.isArray(res))
                 return res.length;
             return Promise.reject('Invalid use of count operation');
@@ -200,15 +201,15 @@ class Oasp4Fn {
         return this;
     }
     project(...attributes: Array<string | string[]>) {
-        this.solution[0] = this.solution[0].then((res: object[] | object): any => {
+        this.solution[0] = this.solution[0].then((res: PromiseResponse): any => {
             if(attributes.length > 0) {
                 if (Array.isArray(res))
-                    return _.reduceRight(res, (result: object[], o: object) => {
-                        result.push(_.pick(o, attributes));
+                    return _.reduceRight(<ArrayLike<object>>res, (result: object[], o: object) => {
+                        result.push(_.pick(o, <_.Many<string>>attributes));
                         return result;
                     }, []);
                 else if (_.isObject(res))
-                    return _.pick(res, attributes)
+                    return _.pick(res, <_.Many<string>>attributes)
                 else
                     return Promise.reject('Invalid use of project operation');
                 }
@@ -218,17 +219,17 @@ class Oasp4Fn {
         return this;
     }
     map(iteratee: _.ObjectIterator<any, any> | string) {
-        this.solution[0] = this.solution[0].then((res: object[]): any => {
+        this.solution[0] = this.solution[0].then((res: PromiseResponse): any => {
             if (_.isObject(res))
-                return _.map(res, iteratee);
+                return _.map(<_.Dictionary<object>>res, <object>iteratee);
             return Promise.reject('Invalid use of map operation');
         });
         return this;
     }
     filter(iteratee: any) {
-        this.solution[0] = this.solution[0].then((res: object[]): any => {
+        this.solution[0] = this.solution[0].then((res: PromiseResponse): any => {
             if (_.isObject(res))
-                return _.filter(res, iteratee);
+                return _.filter(<object>res, iteratee);
             return Promise.reject('Invalid use of filter operation');
         });
         this.solution
@@ -236,9 +237,9 @@ class Oasp4Fn {
     }
     reduce(iteratee: _.MemoIterator<any, any>, accumulator?: any) {
         let _accumulator = accumulator ? accumulator : [];
-        this.solution[0] = this.solution[0].then((res: _.Dictionary<string | object>) => {
+        this.solution[0] = this.solution[0].then((res: PromiseResponse) => {
             if (_.isObject(res))
-                return _.reduceRight(res, iteratee, _accumulator);
+                return _.reduceRight(<object>res, <_.MemoListIterator<any,any,_.NumericDictionary<any>>>iteratee, _accumulator);
             return Promise.reject('Invalid use of reduce operation');
         });
         return this;

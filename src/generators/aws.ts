@@ -114,7 +114,7 @@ let expressionHelper = (child: ts.ExpressionStatement, obj: any) => {
     if ((<ts.Identifier>(<ts.PropertyAccessExpression>expression.expression).expression).text === obj.import && (<ts.Identifier>(<ts.PropertyAccessExpression>expression.expression).name).text === 'config') {
         let args = expression.arguments;
         if (args.length > 0) {
-            let properties = (<ts.ObjectLiteralExpression>args.shift()).properties;
+            let properties = (<ts.ObjectLiteralExpression>args[0]).properties;
             _.assign(obj.oasp4fn.events, extractConfig(properties, obj));
         }
     }

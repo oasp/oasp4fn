@@ -2,7 +2,7 @@
 
 'use strict';
 
-let yml_gen = require('../dist/generator/index');
+let yml_gen = require('../dist/generators/index');
 let fs = require('fs');
 let path = require('path');
 let _ = require('lodash');

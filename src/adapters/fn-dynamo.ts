@@ -37,7 +37,7 @@ export default {
               });
     });
   },
-  getItems: function (table_name: string, ids?: Object[]) {
+  getItems: function (table_name: string, ids?: string[]) {
       if (ids) {
         let params = {
           RequestItems: {}
@@ -46,7 +46,7 @@ export default {
         if (!tables[table_name])
             promise = getKey(table_name);
         return promise.then((res: void) => {
-            let keys = _.reduce(ids, (result: Array<Object>, id: string) => {
+            let keys = _.reduce(ids, (result: object[], id: string) => {
             let push_aux: any = {};
             push_aux[tables[table_name]] = id;
             result.push(push_aux);
