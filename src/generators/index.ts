@@ -70,7 +70,7 @@ export function run(opts?: any) {
     }
     serviceName(options);
     let serverless_yml = tscParser(files, options);
-    if(DEFAULTS.app)
+    if (DEFAULTS.app)
         generateApp(serverless_yml);
     generateYaml(_.omit(serverless_yml, ['imports', 'routes']));
     generateWebpack(files);
@@ -128,7 +128,7 @@ let generateYaml = (obj: any) => {
     fs.writeFile('serverless.yml', dump, (err) => {
         if (err)
             console.log(`  ${chalk.red('Error')} creating severless.yml`);
-        else 
+        else
             console.log(`  ${chalk.blue('serverless.yml')} created succesfully`);
     });
 };
@@ -206,7 +206,7 @@ app.listen(app.get('port'), () => {
     fs.writeFile(`${DEFAULTS.path}/app.ts`, app, (err) => {
         if (err)
             console.log(`  ${chalk.red('Error')} creating app.ts`);
-        else 
+        else
             console.log(`  ${chalk.blue('app.ts')} created succesfully`);
     });
 };

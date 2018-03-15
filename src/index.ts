@@ -75,7 +75,7 @@ export default {
 
         return new Oasp4Fn(solution);
     },
-    deleteObject: function (bucket_name: string, ids: string | string[]){
+    deleteObject: function (bucket_name: string, ids: string | string[]) {
         let solution;
         if (Array.isArray(ids))
             if (_.isEmpty(ids))
@@ -104,7 +104,7 @@ class Oasp4Fn {
 
     constructor(solution: Promise<PromiseResponse>, private names?: {tableName?: string, bucketName?: string}) {
         this.solution.push(solution);
-    };
+    }
 
     table(name: string, ids?: string | string[]) {
         switch (typeof ids) {
@@ -119,9 +119,7 @@ class Oasp4Fn {
             default:
                 this.solution.push(db.getItems(name));
         }
-        
         (<{tableName: string}>this.names).tableName = name;
-    
         return this;
     }
     where(attribute: string, value?: string | number | boolean, comparator?: string) {
@@ -162,8 +160,8 @@ class Oasp4Fn {
         if (typeof attribute === 'string') {
             _order = (order === 'asc' || order === 'desc') ? order : 'asc';
         } else {
-            if(order){
-                if(typeof order === 'string') {
+            if (order) {
+                if (typeof order === 'string') {
                     _order = order === 'desc' ? _.fill(Array(attribute.length), 'desc') : _.fill(Array(attribute.length), 'asc');
                 }
                 else
@@ -202,14 +200,14 @@ class Oasp4Fn {
     }
     project(...attributes: Array<string | string[]>) {
         this.solution[0] = this.solution[0].then((res: PromiseResponse): any => {
-            if(attributes.length > 0) {
+            if (attributes.length > 0) {
                 if (Array.isArray(res))
                     return _.reduceRight(<ArrayLike<object>>res, (result: object[], o: object) => {
                         result.push(_.pick(o, <_.Many<string>>attributes));
                         return result;
                     }, []);
                 else if (_.isObject(res))
-                    return _.pick(res, <_.Many<string>>attributes)
+                    return _.pick(res, <_.Many<string>>attributes);
                 else
                     return Promise.reject('Invalid use of project operation');
                 }
@@ -232,14 +230,14 @@ class Oasp4Fn {
                 return _.filter(<object>res, iteratee);
             return Promise.reject('Invalid use of filter operation');
         });
-        this.solution
+        this.solution;
         return this;
     }
     reduce(iteratee: _.MemoIterator<any, any>, accumulator?: any) {
         let _accumulator = accumulator ? accumulator : [];
         this.solution[0] = this.solution[0].then((res: PromiseResponse) => {
             if (_.isObject(res))
-                return _.reduceRight(<object>res, <_.MemoListIterator<any,any,_.NumericDictionary<any>>>iteratee, _accumulator);
+                return _.reduceRight(<object>res, <_.MemoListIterator<any, any, _.NumericDictionary<any>>>iteratee, _accumulator);
             return Promise.reject('Invalid use of reduce operation');
         });
         return this;
@@ -247,14 +245,14 @@ class Oasp4Fn {
     insert() {
         if ((<{tableName: string}>this.names).tableName) {
             this.solution[0] = this.solution[0].then((res) => {
-                if(Array.isArray(res))
+                if (Array.isArray(res))
                     if (_.isEmpty(res))
                         return Promise.resolve([]);
-                    else 
+                    else
                         return <any>db.putItems((<{tableName: string}>this.names).tableName, res);
                 else
                     return db.putItem((<{tableName: string}>this.names).tableName, res);
-            })
+            });
         }
         else
             this.solution[0] = Promise.reject('Invalid use of insert operation');
@@ -264,27 +262,27 @@ class Oasp4Fn {
     delete() {
         if ((<{tableName: string}>this.names).tableName) {
             this.solution[0] = this.solution[0].then((res: any) => {
-                if(Array.isArray(res)) {
+                if (Array.isArray(res)) {
                     if (_.isEmpty(res))
                         return Promise.resolve([]);
                     else
                         return <any>db.deleteItems((<{tableName: string}>this.names).tableName, _.reduceRight(res, (accum: string[], item, key) => {
-                            if(typeof item === 'string')
+                            if (typeof item === 'string')
                                 accum.push(item);
-                            else if(_.size(item) === 1)
+                            else if (_.size(item) === 1)
                                 accum.push(<string>_.get(item, _.keys(item)[0]));
-                            return accum
+                            return accum;
                     }, []));
                 }
-                else if(_.isObject(res) && _.size(res) === 1)
+                else if (_.isObject(res) && _.size(res) === 1)
                     return db.deleteItem((<{tableName: string}>this.names).tableName, <string>_.get(res, _.keys(res)[0]));
                 else
                     return db.deleteItem((<{tableName: string}>this.names).tableName, res);
-                    
-            })
+            });
         }
-        else 
+        else {
             this.solution[0] = Promise.reject('Invalid use of delete operation');
+        }
 
         return this;
     }
@@ -322,18 +320,19 @@ class Oasp4Fn {
     deleteObject() {
         if ((<{bucketName: string}>this.names).bucketName) {
             this.solution[0] = this.solution[0].then((res: any) => {
-                if(Array.isArray(res)) {
+                if (Array.isArray(res)) {
                     if (_.isEmpty(res))
                         return Promise.resolve([]);
                     else
                          return <any>storage.deleteObjects((<{bucketName: string}>this.names).bucketName, res);
                 }
                 else
-                    return storage.deleteObject((<{bucketName: string}>this.names).bucketName, res)
-            })
+                    return storage.deleteObject((<{bucketName: string}>this.names).bucketName, res);
+            });
         }
-        else 
+        else {
             this.solution[0] = Promise.reject('Invalid use of deleteObject operation');
+        }
 
         return this;
     }
@@ -359,10 +358,9 @@ class Oasp4Fn {
                     return reject(err);
                 });
         }
-        
         return promise;
     }
     promise() {
-        return <Promise<object[] | object | string | string[] | number | never>>this.solution.shift();;
+        return <Promise<object[] | object | string | string[] | number | never>>this.solution.shift();
     }
 }
