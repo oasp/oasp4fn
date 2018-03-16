@@ -1,4 +1,4 @@
-import { Arguments } from 'yargs';
+import { Arguments, Argv } from 'yargs';
 import { run } from '../../generators/index';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -8,7 +8,7 @@ import * as chalk from 'chalk';
 export const command: string = 'generate [provider]';
 export const desc: string = 'Generate serverless.yml and webpack.js based on your project';
 
-export const builder = (yargs: Arguments) => {
+export const builder = (yargs: Argv) =>
     yargs.usage('Usage: $0 generate [provider] [Options]')
         .positional('provider', {
             describe: 'Serverless provider',
@@ -29,10 +29,10 @@ export const builder = (yargs: Arguments) => {
                 alias: 'e',
                 type: 'boolean',
                 desc: 'generates an express app.ts file'}
-        }).example('$0 generate aws', 'Generate files for aws provider').version(false);
-};
+        }).example('$0 generate aws', 'Generate files for aws provider')
+        .version(false);
 
-export const handler = function (argv: Arguments) {
+export const handler = (argv: Arguments) => {
     let opts: any = {
         config: argv.opts,
         app: argv.e,

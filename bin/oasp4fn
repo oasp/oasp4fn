@@ -30,6 +30,7 @@ try {
         .help()
         .alias('h', 'help')
         .demandCommand()
+        .wrap(null)
         .strict(true)
         .argv;
 } catch(e) {
