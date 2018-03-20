@@ -33,11 +33,10 @@ export const builder = (yargs: Argv) =>
         .version(false);
 
 export const handler = (argv: Arguments) => {
-    let opts: any = {
-        config: argv.opts,
-        app: argv.e,
-        path: argv.path
-    };
+    let opts: any = {app: argv.e};
+
+    if (argv.opts) opts.config = argv.opts;
+    if (argv.path) opts.path = argv.path;
 
     if (opts.config) {
         if (fs.existsSync(opts.config)) {

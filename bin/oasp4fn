@@ -5,8 +5,13 @@
 const yargs = require('yargs');
 const chalk = require('chalk');
 
+process.env.DEBUG=true;
+
 function logError(err) {
     if(err) {
+        if (process.env.DEBUG) {
+            console.error(err);
+        }
         switch(typeof err) {
             case 'string':
                 console.log(` ${chalk.red('Error!')} ${err}`)

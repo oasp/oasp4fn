@@ -1,7 +1,7 @@
-import { Argv, Arguments } from "yargs";
+import { Argv, Arguments } from 'yargs';
 import * as path from 'path';
 import * as fs from 'fs-extra';
-
+import * as chalk from 'chalk';
 
 export const command: string = 'project <project-type>';
 export const desc: string =  'Create a new project based on template';
@@ -34,8 +34,10 @@ export const handler = (argv: Arguments) => {
     else {
         argv.path = process.cwd();
     }
-    if (!fs.emptyDirSync(argv.path) && !argv.f) {
+    if (fs.readdirSync(argv.path).length > 0 && !argv.f) {
         throw `The folder must be empty. Use -f in order to force the project creation`;
     }
-    // fs.copySync(`../../../../templates/${argv.projectType}`, argv.path);
+
+    fs.copySync(path.join(__dirname, `../../../../templates/${argv.projectType}`), argv.path);
+    console.log(`${chalk.blue(argv.projectType + ' project')} created succesfully`);
 };
