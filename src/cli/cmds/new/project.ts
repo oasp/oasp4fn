@@ -22,22 +22,39 @@ export const builder =  (yargs: Argv) =>
             alias: 'f',
             type: 'boolean',
             desc: 'Force to create a new project'
+        },
+        provider: {
+            alias: 'P',
+            type: 'string',
+            nargs: 1,
+            default: 'aws',
+            choices: ['aws'],
+            desc: 'The provider for which you want to generate the new project'
         }
     })
     .example('$0 new project nestjs -p ./new-project', `Create a new nestjs project at ${process.cwd()}${path.sep}new-project`)
     .version(false);
 
 export const handler = (argv: Arguments) => {
+    let template: string = argv.projectType;
+
+    if (template === 'serverless' && argv.provider) {
+        template = template.concat('/', argv.provider);
+    }
+
+
     if (argv.path) {
         fs.ensureDirSync(path.join(process.cwd(), argv.path));
     }
+
     else {
         argv.path = process.cwd();
     }
+
     if (fs.readdirSync(argv.path).length > 0 && !argv.f) {
         throw `The folder must be empty. Use -f in order to force the project creation`;
     }
 
-    fs.copySync(path.join(__dirname, `../../../../templates/${argv.projectType}`), argv.path);
+    fs.copySync(path.join(__dirname, `../../../../templates/${template}`), argv.path);
     console.log(`${chalk.blue(argv.projectType + ' project')} created succesfully`);
 };
