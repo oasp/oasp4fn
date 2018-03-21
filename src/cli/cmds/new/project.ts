@@ -42,7 +42,6 @@ export const handler = (argv: Arguments) => {
         template = template.concat('/', argv.provider);
     }
 
-
     if (argv.path) {
         fs.ensureDirSync(path.join(process.cwd(), argv.path));
     }
@@ -55,6 +54,6 @@ export const handler = (argv: Arguments) => {
         throw `The folder must be empty. Use -f in order to force the project creation`;
     }
 
-    fs.copySync(path.join(__dirname, `../../../../templates/${template}`), argv.path);
+    fs.copySync(path.join(__dirname, `../../../../templates/${template}/project`), argv.path);
     console.log(`${chalk.blue(argv.projectType + ' project')} created succesfully`);
 };
