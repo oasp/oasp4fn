@@ -9,21 +9,20 @@ import * as chalk from 'chalk';
 export const command: string = 'handler <provider>';
 export const desc: string =  'Create a new handler based on template';
 
-const eventChoices: string[] = ['Http', 'S3'];
-const triggerChoices: string[][] = [['GET', 'POST', 'PUT', 'DELETE'], ['Created', 'Removed']];
+const providerChoices: string[] = ['aws'];
+const handlerFileEnding = '-handler.ts';
 
 export const builder =  (yargs: Argv) =>
     yargs.usage('Usage: $0 new handler <provider> [Options]')
         .positional('provider', {
             default: 'aws',
             type: 'string',
-            choices: ['aws'],
+            choices: providerChoices,
             desc: 'The provider for which you want to generate the new handler',
         })
         .option({
             event: {
                 alias: 'e',
-                choices: eventChoices,
                 type: 'string',
                 nargs: 1,
                 desc: 'The type of event that you want to listen',
@@ -31,7 +30,6 @@ export const builder =  (yargs: Argv) =>
             trigger: {
                 alias: 't',
                 type: 'string',
-                choices: _.flattenDeep(triggerChoices),
                 desc: 'The type of trigger that will activate the handler',
                 nargs: 1,
             },
@@ -54,11 +52,6 @@ export const builder =  (yargs: Argv) =>
                 nargs: 1,
             },
         })
-        // You cant define a trigger if you dont define a event
-        .check((argv, aliases) => !(!argv.event && argv.trigger))
-        // Check the trigger based on event
-        .check((argv, aliases) => !argv.trigger || ((argv.event === eventChoices[0] && (_.indexOf(triggerChoices[0], argv.trigger) !== -1)) ||
-            ((argv.event === eventChoices[1] && (_.indexOf(triggerChoices[1], argv.trigger)) !== -1))))
         .example('$0 new handler aws --event Http --trigger get --handler-name myHandler --path /mypath', `Create a new AWS handler at /handlers/Http/get/myHandler.ts`)
         .version(false);
 
@@ -66,16 +59,14 @@ export const builder =  (yargs: Argv) =>
 export const handler = (argv: Arguments) => {
     const questions: inquirer.Question[] = [
         {
-            type: 'list',
+            type: 'input',
             name: 'event',
-            choices: eventChoices,
-            message: 'Select the event',
+            message: 'Enter the event that you want generate',
             when: () => !argv.event,
         }, {
             name: 'trigger',
-            type: 'list',
-            message: 'Select the trigger',
-            choices: (answers) => (answers.event === eventChoices[0] || argv.event === eventChoices[0]) ? triggerChoices[0] : triggerChoices[1],
+            type: 'input',
+            message: 'Enter the trigger that will activate the handler',
             when: () => !argv.trigger
         }, {
             name: 'handler-name',
@@ -104,9 +95,9 @@ export const handler = (argv: Arguments) => {
         let template: Buffer = fs.readFileSync(path.join(__dirname, `../../../../templates/serverless/${argv.provider}/handler/${argv.event.toLowerCase()}Handler.mst`));
 
         fs.ensureDirSync(destinationPath);
-        fs.writeFileSync(path.join(destinationPath, result['handler-name'] + 'Handler.ts'), mustache.render(template.toString('utf8'), result));
+        fs.writeFileSync(path.join(destinationPath, result['handler-name'] + handlerFileEnding), mustache.render(template.toString('utf8'), result));
 
-        console.log(`${chalk.blue(result['handler-name'] + 'Handler.ts')} created succesfully`);
+        console.log(`${chalk.blue(result['handler-name'] + handlerFileEnding)} created succesfully`);
     }, (reason: any) => {
         throw reason;
     });
