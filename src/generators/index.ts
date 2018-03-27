@@ -27,24 +27,29 @@ const DEFAULTS = {
 
 const WEBPACK =
 `var path = require('path');
+var nodeExternals = require('webpack-node-externals');
+const slsw = require('serverless-webpack');
 
 module.exports = {
+    entry: slsw.lib.entries,
+    mode: 'development',
     target: 'node',
+    externals: [nodeExternals()],
     module: {
-        loaders: [
-            { test: /\.ts(x?)$/, loader: 'ts-loader' },
+        rules: [
+            { test: /.ts(x?)$/, loader: 'ts-loader' },
             { test: /.json$/, loaders: ['json'] }
         ]
     },
     resolve: {
-        extensions: ['.ts', '.js', '.tsx', '.jsx', '']
+        extensions: ['.ts', '.js', '.tsx', '.jsx']
     },
     output: {
         libraryTarget: 'commonjs',
-        path: path.join(__dirname, '.webpack'),
+        path: path.resolve(__dirname, '.webpack'),
         filename: '[name].js'
     },
-    entry: {
+};
 `;
 
 export function run(opts?: any) {
@@ -134,12 +139,7 @@ let generateYaml = (obj: any) => {
 };
 
 let generateWebpack = (files: any) => {
-    let out = _.reduceRight(files, (accumulator: string, file: string) => {
-        let str = _.replace(file, /\\/g, '/');
-        return `${accumulator}\t\t'${_.replace(str, /.ts$/, '')}': './${str}',\n`;
-    }, WEBPACK);
-    out = `${out}\t}\n};`;
-    fs.writeFile('webpack.config.js', out, (err) => {
+    fs.writeFile('webpack.config.js', WEBPACK, (err) => {
         if (err)
             console.log(`  ${chalk.red('Error')} creating webpack.config.json`);
         else

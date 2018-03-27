@@ -75,12 +75,12 @@ export const handler = (argv: Arguments) => {
         }, {
             name: 'path',
             message: 'Enter the URL path',
-            when: (values) => !argv.path && (argv.event === 'Http' || values.event === 'Http')
+            when: (values) => !argv.path && !(argv.event.toLowerCase() === 's3' || values.event.toLowerCase() === 's3'),
 
         }, {
             name: 'bucket',
             message: 'Enter the bucket name',
-            when: (values) => !argv.bucket && (argv.event === 'S3' || values.event === 'S3')
+            when: (values) => !argv.bucket && !(argv.event.toLowerCase() === 's3' || values.event.toLowerCase() === 's3'),
         }
     ];
 

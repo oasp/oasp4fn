@@ -76,3 +76,6 @@ node_modules/
 
 # Visual Studio Code Settings
 .vscode/
+
+# Yarn error
+yarn-error.log
