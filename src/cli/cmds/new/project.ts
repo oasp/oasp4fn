@@ -2,6 +2,7 @@ import { Argv, Arguments } from 'yargs';
 import * as path from 'path';
 import * as fs from 'fs-extra';
 import * as chalk from 'chalk';
+import * as inquirer from 'inquirer';
 
 export const command: string = 'project <project-type>';
 export const desc: string =  'Create a new project based on template';
@@ -37,6 +38,21 @@ export const builder =  (yargs: Argv) =>
 
 export const handler = (argv: Arguments) => {
     let template: string = argv.projectType;
+    const questions: inquirer.Question[] = [
+        {
+            name: 'projectName',
+            message: 'Enter the project name',
+        }, {
+            name: 'name',
+            type: 'input',
+            message: 'Enter the author full name',
+            when: () => !argv.event,
+        }, {
+            name: 'email',
+            type: 'input',
+            message: 'Enter the author email',
+        },
+    ];
 
     if (template === 'serverless' && argv.provider) {
         template = template.concat('/', argv.provider);
@@ -54,6 +70,18 @@ export const handler = (argv: Arguments) => {
         throw `The folder must be empty. Use -f in order to force the project creation`;
     }
 
-    fs.copySync(path.join(__dirname, `../../../../templates/${template}/project`), argv.path);
-    console.log(`${chalk.blue(argv.projectType + ' project')} created succesfully`);
+    inquirer.prompt(questions).then((values: inquirer.Answers) => {
+        fs.copySync(path.join(__dirname, `../../../../templates/${template}/project`), argv.path);
+        const packagejson = require(path.resolve(argv.path, 'package.json'));
+        packagejson.author = {};
+        packagejson.author.name = values.name;
+        packagejson.author.email = values.email;
+        packagejson.name = values.projectName;
+
+        fs.writeFileSync(path.resolve(argv.path, 'package.json'), JSON.stringify(packagejson, null, 2));
+
+        console.log(`${chalk.blue(argv.projectType + ' project')} created succesfully`);
+    }, (reason: any) => {
+        throw reason;
+    });
 };
