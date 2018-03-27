@@ -7,7 +7,7 @@ let DynamoDB = require('aws-sdk/clients/dynamodb');
 
 let endpoint = process.env.ENDPOINT || 'http://localhost:4569/';
 let region = process.env.DEFAULT_REGION || 'us-east-1';
-let dynamodb = new DynamoDB({ endpoint: endpoint, region: region, credentials: new Credentials('akid', 'secret', 'session') });
+let dynamodb = new DynamoDB({ endpoint: endpoint, region: region });
 let docClient = new DynamoDB.DocumentClient({ endpoint: endpoint, region: region });
 
 fn.setDB(dynamo, { endpoint: endpoint, region: region });
