@@ -1,15 +1,16 @@
 import { Arguments, Argv } from 'yargs';
-import { run } from '../../generators/index';
+import { run } from '../../../generators/index';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as _ from 'lodash';
 import * as chalk from 'chalk';
 
-export const command: string = 'generate [provider]';
-export const desc: string = 'Generate serverless.yml and webpack.js based on your project';
+export const command: string = 'eject [provider]';
+export const aliases: string[] = ['e'];
+export const describe: string = 'Generate serverless.yml and webpack.js based on your project';
 
 export const builder = (yargs: Argv) =>
-    yargs.usage('Usage: $0 generate [provider] [Options]')
+    yargs.usage('Usage: $0 serverless eject [provider] [Options]')
         .positional('provider', {
             describe: 'Serverless provider',
             choices: ['aws', 'azure', 'google', 'openwhisk'],
@@ -29,7 +30,7 @@ export const builder = (yargs: Argv) =>
                 alias: 'e',
                 type: 'boolean',
                 desc: 'generates an express app.ts file'}
-        }).example('$0 generate aws', 'Generate files for aws provider')
+        }).example('$0 serverles eject aws', 'Generate all files which are neccesary to start a new project for aws provider')
         .version(false);
 
 export const handler = (argv: Arguments) => {

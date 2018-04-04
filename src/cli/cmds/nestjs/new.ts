@@ -4,14 +4,15 @@ import * as fs from 'fs-extra';
 import * as chalk from 'chalk';
 import * as inquirer from 'inquirer';
 
-export const command: string = 'project <project-type>';
-export const desc: string =  'Create a new project based on template';
+export const command: string = 'new [project-name]';
+export const aliases: string[] = ['n'];
+export const desc: string =  'Create a new nestjs project based on template';
 
 export const builder =  (yargs: Argv) =>
-    yargs.usage('Usage: $0 new project <project-type> [Options]')
-        .positional('project-type', {
-        desc: 'The type of project that you want to create',
-        choices: ['serverless', 'nestjs'],
+    yargs.usage('Usage: $0 new [project-name] [Options]')
+        .positional('project-name', {
+        desc: 'The name of the project that you want to create',
+        type: 'string',
     }).options({
         path: {
             alias: 'p',
@@ -24,16 +25,8 @@ export const builder =  (yargs: Argv) =>
             type: 'boolean',
             desc: 'Force to create a new project'
         },
-        provider: {
-            alias: 'P',
-            type: 'string',
-            nargs: 1,
-            default: 'aws',
-            choices: ['aws'],
-            desc: 'The provider for which you want to generate the new project'
-        }
     })
-    .example('$0 new project nestjs -p ./new-project', `Create a new nestjs project at ${process.cwd()}${path.sep}new-project`)
+    .example('$0 nestjs new -p ./new-project', `Create a new nestjs project at ${process.cwd()}${path.sep}new-project`)
     .version(false);
 
 export const handler = (argv: Arguments) => {
@@ -42,11 +35,11 @@ export const handler = (argv: Arguments) => {
         {
             name: 'projectName',
             message: 'Enter the project name',
+            when: () => !argv.projectName
         }, {
             name: 'name',
             type: 'input',
             message: 'Enter the author full name',
-            when: () => !argv.event,
         }, {
             name: 'email',
             type: 'input',
@@ -54,15 +47,9 @@ export const handler = (argv: Arguments) => {
         },
     ];
 
-    if (template === 'serverless' && argv.provider) {
-        template = template.concat('/', argv.provider);
-    }
-
     if (argv.path) {
         fs.ensureDirSync(path.join(process.cwd(), argv.path));
-    }
-
-    else {
+    } else {
         argv.path = process.cwd();
     }
 
@@ -71,17 +58,19 @@ export const handler = (argv: Arguments) => {
     }
 
     inquirer.prompt(questions).then((values: inquirer.Answers) => {
-        fs.copySync(path.join(__dirname, `../../../../templates/${template}/project`), argv.path);
+        fs.copySync(path.join(__dirname, `../../../../templates/nestjs/project`), argv.path);
         const packagejson = require(path.resolve(argv.path, 'package.json'));
         packagejson.author = {};
+        packagejson.name = argv.projectName || values.projectName;
         packagejson.author.name = values.name;
         packagejson.author.email = values.email;
-        packagejson.name = values.projectName;
 
         fs.writeFileSync(path.resolve(argv.path, 'package.json'), JSON.stringify(packagejson, null, 2));
 
-        console.log(`${chalk.blue(argv.projectType + ' project')} created succesfully`);
+        console.log(`${chalk.blue('nestjs project')} created succesfully`);
     }, (reason: any) => {
+        throw reason;
+    }).catch((reason: any) => {
         throw reason;
     });
 };

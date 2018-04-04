@@ -7,13 +7,14 @@ import * as path from 'path';
 import * as chalk from 'chalk';
 
 export const command: string = 'handler <provider>';
-export const desc: string =  'Create a new handler based on template';
+export const aliases: string[] = ['h'];
+export const desc: string =  'Geneate a new handler based on template';
 
 const providerChoices: string[] = ['aws'];
 const handlerFileEnding = '-handler.ts';
 
 export const builder =  (yargs: Argv) =>
-    yargs.usage('Usage: $0 new handler <provider> [Options]')
+    yargs.usage('Usage: $0 serverless generate handler <provider> [Options]')
         .positional('provider', {
             default: 'aws',
             type: 'string',
@@ -52,7 +53,7 @@ export const builder =  (yargs: Argv) =>
                 nargs: 1,
             },
         })
-        .example('$0 new handler aws --event Http --trigger get --handler-name myHandler --path /mypath', `Create a new AWS handler at /handlers/Http/get/myHandler.ts`)
+        .example('$0 serverless generate handler aws --event Http --trigger get --handler-name myHandler --path /mypath', `Create a new AWS handler at /handlers/Http/get/myHandler.ts`)
         .version(false);
 
 
@@ -92,13 +93,13 @@ export const handler = (argv: Arguments) => {
             result.path = `/${result.path}`;
         }
 
-        let template: Buffer = fs.readFileSync(path.join(__dirname, `../../../../templates/serverless/${argv.provider}/handler/${argv.event.toLowerCase()}Handler.mst`));
+        let template: Buffer = fs.readFileSync(path.join(__dirname, `../../../../../templates/serverless/${argv.provider.toLowerCase()}/handler/${argv.event.toLowerCase()}Handler.mst`));
 
         fs.ensureDirSync(destinationPath);
         fs.writeFileSync(path.join(destinationPath, result['handler-name'] + handlerFileEnding), mustache.render(template.toString('utf8'), result));
 
         console.log(`${chalk.blue(result['handler-name'] + handlerFileEnding)} created succesfully`);
-    }, (reason: any) => {
+    }).catch((reason: any) => {
         throw reason;
     });
 };
