@@ -3,6 +3,9 @@ import * as path from 'path';
 import * as fs from 'fs-extra';
 import * as chalk from 'chalk';
 import * as inquirer from 'inquirer';
+import * as _ from 'lodash';
+import { ProjectType, NewProjectOptions } from '../../types/cliTypes';
+import { generateNewProject } from '../../logic/newProject';
 
 export const command: string = 'new [project-name]';
 export const aliases: string[] = ['n'];
@@ -58,16 +61,9 @@ export const handler = (argv: Arguments) => {
     }
 
     inquirer.prompt(questions).then((values: inquirer.Answers) => {
-        fs.copySync(path.join(__dirname, `../../../../templates/nestjs/project`), argv.path);
-        const packagejson = require(path.resolve(argv.path, 'package.json'));
-        packagejson.author = {};
-        packagejson.name = argv.projectName || values.projectName;
-        packagejson.author.name = values.name;
-        packagejson.author.email = values.email;
+        const options: NewProjectOptions = _.assign(argv, values) as any;
 
-        fs.writeFileSync(path.resolve(argv.path, 'package.json'), JSON.stringify(packagejson, null, 2));
-
-        console.log(`${chalk.blue('nestjs project')} created succesfully`);
+        generateNewProject(ProjectType.Nestjs, options);
     }, (reason: any) => {
         throw reason;
     }).catch((reason: any) => {

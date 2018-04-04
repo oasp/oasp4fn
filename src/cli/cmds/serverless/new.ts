@@ -1,8 +1,10 @@
 import { Argv, Arguments } from 'yargs';
 import * as path from 'path';
 import * as fs from 'fs-extra';
-import * as chalk from 'chalk';
 import * as inquirer from 'inquirer';
+import * as _ from 'lodash';
+import { generateNewProject } from '../../logic/newProject';
+import { ProjectType, NewProjectOptions } from '../../types/cliTypes';
 
 export const command: string = 'new [project-name]';
 export const aliases: string[] = ['n'];
@@ -38,7 +40,6 @@ export const builder =  (yargs: Argv) =>
     .version(false);
 
 export const handler = (argv: Arguments) => {
-    let template: string = argv.projectType;
     const questions: inquirer.Question[] = [
         {
             name: 'projectName',
@@ -57,9 +58,7 @@ export const handler = (argv: Arguments) => {
 
     if (argv.path) {
         fs.ensureDirSync(path.join(process.cwd(), argv.path));
-    }
-
-    else {
+    } else {
         argv.path = process.cwd();
     }
 
@@ -68,16 +67,9 @@ export const handler = (argv: Arguments) => {
     }
 
     inquirer.prompt(questions).then((values: inquirer.Answers) => {
-        fs.copySync(path.join(__dirname, `../../../../templates/serverless/${argv.provider}/project`), argv.path);
-        const packagejson = require(path.resolve(argv.path, 'package.json'));
-        packagejson.author = {};
-        packagejson.name = argv.projectName || values.projectName;
-        packagejson.author.name = values.name;
-        packagejson.author.email = values.email;
+        const options: NewProjectOptions = _.assign(argv, values) as any;
 
-        fs.writeFileSync(path.resolve(argv.path, 'package.json'), JSON.stringify(packagejson, null, 2));
-
-        console.log(`${chalk.blue('serverless project')} created succesfully`);
+        generateNewProject(ProjectType.Serverless, options);
     }, (reason: any) => {
         throw reason;
     }).catch((reason: any) => {

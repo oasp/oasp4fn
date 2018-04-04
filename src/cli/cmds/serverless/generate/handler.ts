@@ -1,17 +1,13 @@
 import { Argv, Arguments } from 'yargs';
 import * as inquirer from 'inquirer';
 import * as _ from 'lodash';
-import * as mustache from 'mustache';
-import * as fs from 'fs-extra';
-import * as path from 'path';
-import * as chalk from 'chalk';
+import { generateNewHandler } from '../../../logic/serverless/newHandler';
 
 export const command: string = 'handler <provider>';
 export const aliases: string[] = ['h'];
 export const desc: string =  'Geneate a new handler based on template';
 
 const providerChoices: string[] = ['aws'];
-const handlerFileEnding = '-handler.ts';
 
 export const builder =  (yargs: Argv) =>
     yargs.usage('Usage: $0 serverless generate handler <provider> [Options]')
@@ -86,19 +82,9 @@ export const handler = (argv: Arguments) => {
     ];
 
     inquirer.prompt(questions).then((values: inquirer.Answers) => {
-        const result = _.assign(argv, values);
-        const destinationPath = path.join(process.cwd(), `handlers/${result.event}/${result.trigger}`);
+        const result = _.assign(argv, values) as any;
 
-        if (result.path && !result.path.startsWith('/')) {
-            result.path = `/${result.path}`;
-        }
-
-        let template: Buffer = fs.readFileSync(path.join(__dirname, `../../../../../templates/serverless/${argv.provider.toLowerCase()}/handler/${argv.event.toLowerCase()}Handler.mst`));
-
-        fs.ensureDirSync(destinationPath);
-        fs.writeFileSync(path.join(destinationPath, result['handler-name'] + handlerFileEnding), mustache.render(template.toString('utf8'), result));
-
-        console.log(`${chalk.blue(result['handler-name'] + handlerFileEnding)} created succesfully`);
+        generateNewHandler(result);
     }).catch((reason: any) => {
         throw reason;
     });
