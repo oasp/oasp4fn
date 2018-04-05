@@ -6,7 +6,6 @@ export enum ProjectType {
 export interface NewProjectOptions {
     projectName: string;
     path: string;
-    force?: boolean;
     provider?: string;
     name: string;
     email: string;

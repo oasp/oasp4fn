@@ -1,4 +1,4 @@
 --require ts-node/register
---reporter nyan
+--reporter spec
 --watch-extensions tsx,ts
 test/**/*.ts

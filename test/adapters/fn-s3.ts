@@ -95,7 +95,7 @@ describe('deleteObject', function () {
         promises.push(<Promise<object>>fn.upload('oasp4fn', 'test3.txt', new Buffer('test')).promise());
         promises.push(<Promise<object>>fn.upload('oasp4fn', 'test4.txt', new Buffer('test')).promise());
         promises.push(<Promise<object>>fn.upload('oasp4fn', 'test5.txt', new Buffer('test')).promise());
-        return Promise.all(promises)
+        return Promise.all(promises);
      });
 
      it('The function should return a reference to the self object', () => {

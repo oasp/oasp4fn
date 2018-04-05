@@ -6,8 +6,8 @@ import { NewHandlerOptions } from '../../types/cliTypes';
 
 const handlerFileEnding = '-handler.ts';
 
-export function generateNewHandler(options: NewHandlerOptions) {
-    const destinationPath = path.join(process.cwd(), `handlers/${options.event}/${options.trigger}`);
+export function generateNewHandler(options: NewHandlerOptions, destFolder?: string) {
+    const destinationPath = path.join((destFolder || process.cwd()), `handlers/${options.event}/${options.trigger}`);
 
     if (options.path && !options.path.startsWith('/')) {
         options.path = `/${options.path}`;
