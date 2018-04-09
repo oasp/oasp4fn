@@ -1,10 +1,10 @@
 import { Argv, Arguments } from 'yargs';
 import {SchemaSyncCommand} from 'typeorm/commands/SchemaSyncCommand';
-import {SchemaDropCommand} from "typeorm/commands/SchemaDropCommand";
-import {QueryCommand} from "typeorm/commands/QueryCommand";
-import {EntityCreateCommand} from "typeorm/commands/EntityCreateCommand";
-import {MigrationCreateCommand} from "typeorm/commands/MigrationCreateCommand";
-import {MigrationRunCommand} from "typeorm/commands/MigrationRunCommand";
+import {SchemaDropCommand} from 'typeorm/commands/SchemaDropCommand';
+import {QueryCommand} from 'typeorm/commands/QueryCommand';
+import {EntityCreateCommand} from 'typeorm/commands/EntityCreateCommand';
+import {MigrationCreateCommand} from 'typeorm/commands/MigrationCreateCommand';
+import {MigrationRunCommand} from 'typeorm/commands/MigrationRunCommand';
 import {MigrationRevertCommand} from 'typeorm/commands/MigrationRevertCommand';
 import {SubscriberCreateCommand} from 'typeorm/commands/SubscriberCreateCommand';
 import {SchemaLogCommand} from 'typeorm/commands/SchemaLogCommand';
