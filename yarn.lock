@@ -10,6 +10,19 @@
   version "0.4.31"
   resolved "https://registry.yarnpkg.com/@types/chalk/-/chalk-0.4.31.tgz#a31d74241a6b1edbb973cf36d97a2896834a51f9"
 
+"@types/fs-extra@^5.0.1":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@types/fs-extra/-/fs-extra-5.0.1.tgz#cd856fbbdd6af2c11f26f8928fd8644c9e9616c9"
+  dependencies:
+    "@types/node" "*"
+
+"@types/inquirer@^0.0.38":
+  version "0.0.38"
+  resolved "https://registry.yarnpkg.com/@types/inquirer/-/inquirer-0.0.38.tgz#5c682b87152ebe8d759c875f2edbc56d787c6b99"
+  dependencies:
+    "@types/rx" "*"
+    "@types/through" "*"
+
 "@types/js-yaml@^3.5.30":
   version "3.10.1"
   resolved "https://registry.yarnpkg.com/@types/js-yaml/-/js-yaml-3.10.1.tgz#a4ddaf67fec34151e620cdbdd22e40b64217f577"
@@ -22,9 +35,111 @@
   version "2.2.48"
   resolved "https://registry.yarnpkg.com/@types/mocha/-/mocha-2.2.48.tgz#3523b126a0b049482e1c3c11877460f76622ffab"
 
+"@types/mustache@^0.8.30":
+  version "0.8.30"
+  resolved "https://registry.yarnpkg.com/@types/mustache/-/mustache-0.8.30.tgz#65e479073bc15e8ac834347f8f311b24220a277d"
+
+"@types/node@*":
+  version "9.4.7"
+  resolved "http://registry.npmjs.org/@types/node/-/node-9.4.7.tgz#57d81cd98719df2c9de118f2d5f3b1120dcd7275"
+
 "@types/node@^7.0.5":
   version "7.0.55"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-7.0.55.tgz#7bb6215ff9425a1d714106be9f0d3e0e28829288"
+
+"@types/rx-core-binding@*":
+  version "4.0.4"
+  resolved "https://registry.yarnpkg.com/@types/rx-core-binding/-/rx-core-binding-4.0.4.tgz#d969d32f15a62b89e2862c17b3ee78fe329818d3"
+  dependencies:
+    "@types/rx-core" "*"
+
+"@types/rx-core@*":
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/@types/rx-core/-/rx-core-4.0.3.tgz#0b3354b1238cedbe2b74f6326f139dbc7a591d60"
+
+"@types/rx-lite-aggregates@*":
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/@types/rx-lite-aggregates/-/rx-lite-aggregates-4.0.3.tgz#6efb2b7f3d5f07183a1cb2bd4b1371d7073384c2"
+  dependencies:
+    "@types/rx-lite" "*"
+
+"@types/rx-lite-async@*":
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/@types/rx-lite-async/-/rx-lite-async-4.0.2.tgz#27fbf0caeff029f41e2d2aae638b05e91ceb600c"
+  dependencies:
+    "@types/rx-lite" "*"
+
+"@types/rx-lite-backpressure@*":
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/@types/rx-lite-backpressure/-/rx-lite-backpressure-4.0.3.tgz#05abb19bdf87cc740196c355e5d0b37bb50b5d56"
+  dependencies:
+    "@types/rx-lite" "*"
+
+"@types/rx-lite-coincidence@*":
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/@types/rx-lite-coincidence/-/rx-lite-coincidence-4.0.3.tgz#80bd69acc4054a15cdc1638e2dc8843498cd85c0"
+  dependencies:
+    "@types/rx-lite" "*"
+
+"@types/rx-lite-experimental@*":
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/@types/rx-lite-experimental/-/rx-lite-experimental-4.0.1.tgz#c532f5cbdf3f2c15da16ded8930d1b2984023cbd"
+  dependencies:
+    "@types/rx-lite" "*"
+
+"@types/rx-lite-joinpatterns@*":
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/@types/rx-lite-joinpatterns/-/rx-lite-joinpatterns-4.0.1.tgz#f70fe370518a8432f29158cc92ffb56b4e4afc3e"
+  dependencies:
+    "@types/rx-lite" "*"
+
+"@types/rx-lite-testing@*":
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/@types/rx-lite-testing/-/rx-lite-testing-4.0.1.tgz#21b19d11f4dfd6ffef5a9d1648e9c8879bfe21e9"
+  dependencies:
+    "@types/rx-lite-virtualtime" "*"
+
+"@types/rx-lite-time@*":
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/@types/rx-lite-time/-/rx-lite-time-4.0.3.tgz#0eda65474570237598f3448b845d2696f2dbb1c4"
+  dependencies:
+    "@types/rx-lite" "*"
+
+"@types/rx-lite-virtualtime@*":
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/@types/rx-lite-virtualtime/-/rx-lite-virtualtime-4.0.3.tgz#4b30cacd0fe2e53af29f04f7438584c7d3959537"
+  dependencies:
+    "@types/rx-lite" "*"
+
+"@types/rx-lite@*":
+  version "4.0.5"
+  resolved "https://registry.yarnpkg.com/@types/rx-lite/-/rx-lite-4.0.5.tgz#b3581525dff69423798daa9a0d33c1e66a5e8c4c"
+  dependencies:
+    "@types/rx-core" "*"
+    "@types/rx-core-binding" "*"
+
+"@types/rx@*":
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/@types/rx/-/rx-4.1.1.tgz#598fc94a56baed975f194574e0f572fd8e627a48"
+  dependencies:
+    "@types/rx-core" "*"
+    "@types/rx-core-binding" "*"
+    "@types/rx-lite" "*"
+    "@types/rx-lite-aggregates" "*"
+    "@types/rx-lite-async" "*"
+    "@types/rx-lite-backpressure" "*"
+    "@types/rx-lite-coincidence" "*"
+    "@types/rx-lite-experimental" "*"
+    "@types/rx-lite-joinpatterns" "*"
+    "@types/rx-lite-testing" "*"
+    "@types/rx-lite-time" "*"
+    "@types/rx-lite-virtualtime" "*"
+
+"@types/through@*":
+  version "0.0.29"
+  resolved "https://registry.yarnpkg.com/@types/through/-/through-0.0.29.tgz#72943aac922e179339c651fa34a4428a4d722f93"
+  dependencies:
+    "@types/node" "*"
 
 "@types/yargs@^11.0.0":
   version "11.0.0"
@@ -614,7 +729,7 @@ extend@~3.0.0:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/extend/-/extend-3.0.1.tgz#a755ea7bc1adfcc5a31ce7e762dbaadc5e636444"
 
-external-editor@^2.0.4:
+external-editor@^2.0.4, external-editor@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/external-editor/-/external-editor-2.1.0.tgz#3d026a21b7f95b5726387d4200ac160d372c3b48"
   dependencies:
@@ -694,6 +809,14 @@ form-data@~2.1.1:
     asynckit "^0.4.0"
     combined-stream "^1.0.5"
     mime-types "^2.1.12"
+
+fs-extra@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-5.0.0.tgz#414d0110cdd06705734d055652c5411260c31abd"
+  dependencies:
+    graceful-fs "^4.1.2"
+    jsonfile "^4.0.0"
+    universalify "^0.1.0"
 
 fs.realpath@^1.0.0:
   version "1.0.0"
@@ -816,7 +939,7 @@ got@^6.7.1:
     unzip-response "^2.0.1"
     url-parse-lax "^1.0.0"
 
-graceful-fs@^4.1.11, graceful-fs@^4.1.2:
+graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6:
   version "4.1.11"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.1.11.tgz#0e8bdfe4d1ddb8854d64e04ea7c00e2a026e5658"
 
@@ -938,6 +1061,24 @@ inquirer@^3.0.6, inquirer@^3.3.0:
     run-async "^2.2.0"
     rx-lite "^4.0.8"
     rx-lite-aggregates "^4.0.8"
+    string-width "^2.1.0"
+    strip-ansi "^4.0.0"
+    through "^2.3.6"
+
+inquirer@^5.1.0:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/inquirer/-/inquirer-5.1.0.tgz#19da508931892328abbbdd4c477f1efc65abfd67"
+  dependencies:
+    ansi-escapes "^3.0.0"
+    chalk "^2.0.0"
+    cli-cursor "^2.1.0"
+    cli-width "^2.0.0"
+    external-editor "^2.1.0"
+    figures "^2.0.0"
+    lodash "^4.3.0"
+    mute-stream "0.0.7"
+    run-async "^2.2.0"
+    rxjs "^5.5.2"
     string-width "^2.1.0"
     strip-ansi "^4.0.0"
     through "^2.3.6"
@@ -1135,6 +1276,12 @@ json-stable-stringify@^1.0.1:
 json-stringify-safe@~5.0.1:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz#1296a2d58fd45f19a0f6ce01d65701e2c735b6eb"
+
+jsonfile@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/jsonfile/-/jsonfile-4.0.0.tgz#8771aae0799b64076b76640fca058f9c10e33ecb"
+  optionalDependencies:
+    graceful-fs "^4.1.6"
 
 jsonify@~0.0.0:
   version "0.0.0"
@@ -1385,6 +1532,10 @@ minimist@^1.1.0, minimist@^1.1.3, minimist@^1.2.0:
 ms@2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.0.0.tgz#5608aeadfc00be6c2901df5f9861788de0d597c8"
+
+mustache@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/mustache/-/mustache-2.3.0.tgz#4028f7778b17708a489930a6e52ac3bca0da41d0"
 
 mute-stream@0.0.7:
   version "0.0.7"
@@ -2145,7 +2296,7 @@ type-detect@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/type-detect/-/type-detect-1.0.0.tgz#762217cc06db258ec48908a1298e8b95121e8ea2"
 
-typescript@^2.3.2:
+typescript@^2.6.2:
   version "2.7.2"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.7.2.tgz#2d615a1ef4aee4f574425cdff7026edf81919836"
 
@@ -2158,6 +2309,10 @@ unique-string@^1.0.0:
   resolved "https://registry.yarnpkg.com/unique-string/-/unique-string-1.0.0.tgz#9e1057cca851abb93398f8b33ae187b99caec11a"
   dependencies:
     crypto-random-string "^1.0.0"
+
+universalify@^0.1.0:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/universalify/-/universalify-0.1.1.tgz#fa71badd4437af4c148841e3b3b165f9e9e590b7"
 
 unzip-response@^2.0.1:
   version "2.0.1"

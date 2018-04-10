@@ -7,6 +7,9 @@ const chalk = require('chalk');
 
 function logError(err) {
     if(err) {
+        if (process.env.DEBUG) {
+            console.error(err);
+        }
         switch(typeof err) {
             case 'string':
                 console.log(` ${chalk.red('Error!')} ${err}`)
@@ -30,6 +33,7 @@ try {
         .help()
         .alias('h', 'help')
         .demandCommand()
+        .wrap(null)
         .strict(true)
         .argv;
 } catch(e) {

@@ -2,6 +2,7 @@
 import { expect } from 'chai';
 import fn from '../../src/index';
 import dynamo from '../../src/adapters/fn-dynamo';
+import { Credentials } from 'aws-sdk';
 let DynamoDB = require('aws-sdk/clients/dynamodb');
 
 let endpoint = process.env.ENDPOINT || 'http://localhost:4569/';
@@ -56,7 +57,7 @@ before(async function ()  {
     };
     try {
         await dynamodb.deleteTable({TableName: 'employees'}).promise();
-    }catch (err) {
+    } catch (err) {
         if (err.code !== 'ResourceNotFoundException')
             return Promise.reject(err);
     }
@@ -77,7 +78,7 @@ before(async function ()  {
     };
     try {
         await dynamodb.deleteTable({TableName: 'departments'}).promise();
-    }catch (err) {
+    } catch (err) {
         if (err.code !== 'ResourceNotFoundException')
             return Promise.reject(err);
     }
@@ -163,7 +164,7 @@ describe('where', () => {
                  .where('id', '1', '23')
                  .then((res: Employee[]) => {
                     expect(res).to.be.undefined;
-                    
+
                  }, (err: Error) => {
                     expect(err).to.be.a('string');
                  });
@@ -200,7 +201,7 @@ describe('orderBy', () => {
         }
      });
 
-     it("If you pass more than one attribute, the result array should be sorted having in mind all the atributtes", async () => {
+     it('If you pass more than one attribute, the result array should be sorted having in mind all the atributtes', async () => {
         const res = <Employee[]>await fn.table('employees')
                                          .orderBy(['department', 'id'], 'desc')
                                          .promise();
@@ -214,7 +215,7 @@ describe('orderBy', () => {
         }
      });
 
-     it("If you pass more than one attribute and more than one order, the result array should be sorted having in mind all the atributtes and all orders", async () => {  
+     it('If you pass more than one attribute and more than one order, the result array should be sorted having in mind all the atributtes and all orders', async () => {
         const res = <Employee[]>await fn.table('employees')
                                          .orderBy(['department', 'id'], ['desc', 'asc'])
                                          .promise();
@@ -228,7 +229,7 @@ describe('orderBy', () => {
         }
      });
 
-     it("If you pass more orders than attributes, the first orders corresponding to the attributtes length should be used", async () => {
+     it('If you pass more orders than attributes, the first orders corresponding to the attributtes length should be used', async () => {
         const res = <Employee[]>await fn.table('employees')
                                         .orderBy(['department', 'id'], ['desc', 'asc', 'des'])
                                         .promise();
@@ -251,7 +252,7 @@ describe('orderBy', () => {
         let i = res.length;
         while (--i) {
             expect(res[i].department <= res[i - 1].department).to.be.true;
-            if(res[i].department === res[i - 1].department)
+            if (res[i].department === res[i - 1].department)
                 expect(res[i].id >= res[i - 1].id).to.be.true;
         }
      });
@@ -285,7 +286,7 @@ describe('first', () => {
                             .promise();
         expect(res).to.be.an('array');
         expect(res).to.have.lengthOf(1);
-        expect(res[0]).to.deep.equal(first_object);
+        expect((res as any)[0]).to.deep.equal(first_object);
      });
 
      it("If the operation isn't done over an array, the operation should return an Error", () => {
@@ -485,7 +486,7 @@ describe('filter', () => {
         res.forEach(o => {
             expect(o).to.be.an('object');
             expect(o).to.have.all.keys(['id', 'firstname', 'surname', 'department']);
-        });                    
+        });
      });
 
      it('The operation can be done over a json object, and the result should be an array', async () => {
@@ -523,7 +524,7 @@ describe('join', () => {
         expect(res).to.be.an('array');
         expect(res).to.have.lengthOf(4);
      });
-     
+
      it('If the operation fail, the resolution should be an error', () => {
         return fn.table('employees')
                  .join('department', 'id')
@@ -565,7 +566,7 @@ describe('insert', () => {
         expect(res).to.be.an('array');
         expect(res).to.have.lengthOf(7);
      });
-     
+
      it('If an empty array is passed to the operation, the result should be an empty array', async () => {
         const res = await fn.insert('employees', [])
                              .promise();
@@ -641,12 +642,12 @@ describe('delete', () => {
         expect(res).to.be.an('string').equal('13');
      });
 
-    it('If the operation is not starter, it\'s possible to get the items to delete reducing an array of objects', async () => {   
+    it('If the operation is not starter, it\'s possible to get the items to delete reducing an array of objects', async () => {
         const res = await fn.table('departments')
                              .reduce((accum: string[], o: Department) => {
                                 if (Number.parseInt(o.id) > 13)
-                                    accum.push(o.id)
-                                return accum
+                                    accum.push(o.id);
+                                return accum;
                              })
                              .delete()
                              .promise();
@@ -654,7 +655,7 @@ describe('delete', () => {
         expect(res).to.have.lengthOf(2);
         expect(res).to.have.members(['15', '16']);
      });
-     
+
      it('If an empty array is passed to the operation, the result should be an empty array', async () => {
         const res = await fn.delete('employees', [])
                             .promise();
@@ -676,7 +677,7 @@ describe('delete', () => {
                 }, (err: Error) => {
                     expect(err).to.not.be.null;
              });
-        
+
      });
 
      it('If the operation tries to delete an inexistent item, the resolution should be an error', () => {
