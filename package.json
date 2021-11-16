@@ -52,7 +52,7 @@
     "np": "^2.16.0"
   },
   "dependencies": {
-    "aws-sdk": "2.20.x",
+    "aws-sdk": "2.814.x",
     "chalk": "^1.1.3",
     "js-yaml": "^3.8.4",
     "lodash": "^4.17.4",
